@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Aloha Thank You Party - Virtual Photobooth</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Georgia', 'Sarabun', serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    background: #E85D26;
+  }
+
+  .screen { display:none; }
+  .screen.active { display:flex; }
+
+  .app {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-family: 'Georgia', 'Sarabun', serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .app-default-bg {
+    background: linear-gradient(135deg, #FF9A3C 0%, #FF6B35 50%, #E85D26 100%);
+  }
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── Animations ─── */
+  @keyframes fadeInDown {
+    from { opacity:0; transform:translateY(-30px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity:0; transform:translateY(30px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  @keyframes float0 { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-15px) rotate(10deg)} }
+  @keyframes float1 { 0%,100%{transform:translateY(0) rotate(45deg)} 50%{transform:translateY(-20px) rotate(55deg)} }
+  @keyframes float2 { 0%,100%{transform:translateY(0) rotate(90deg)} 50%{transform:translateY(-10px) rotate(100deg)} }
+  @keyframes countPulse {
+    0% { transform:scale(0.3); opacity:0; }
+    40% { transform:scale(1.2); opacity:1; }
+    100% { transform:scale(1); opacity:1; }
+  }
+  @keyframes flashAnim {
+    0% { opacity:1; }
+    100% { opacity:0; }
+  }
+  @keyframes popIn {
+    0% { transform:scale(0.5); opacity:0; }
+    100% { transform:scale(1); opacity:1; }
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow:0 4px 20px rgba(0,0,0,0.3); }
+    50% { box-shadow:0 4px 30px rgba(255,215,0,0.5); }
+  }
+  @keyframes spin {
+    from { transform:rotate(0deg); }
+    to { transform:rotate(360deg); }
+  }
+  @keyframes postcardReveal {
+    0% { opacity:0; transform:perspective(800px) rotateY(90deg) scale(0.5); }
+    60% { opacity:1; transform:perspective(800px) rotateY(-10deg) scale(1.02); }
+    100% { transform:perspective(800px) rotateY(0deg) scale(1); }
+  }
+
+  /* ─── Buttons ─── */
+  .btn-start {
+    background: rgba(255,255,255,0.95);
+    color: #E85D26;
+    border: none;
+    border-radius: 50px;
+    padding: 18px 56px;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    animation: fadeInUp 1s ease-out 0.3s both;
+    font-family: 'Sarabun', sans-serif;
+  }
+  .btn-start:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+
+  .btn-back {
+    margin-top: 24px;
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 50px;
+    padding: 10px 32px;
+    color: #FFF;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-back:hover { border-color: rgba(255,255,255,0.7); }
+
+  /* ─── Template Cards ─── */
+  .tpl-card {
+    position: relative;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 16px;
+    padding: 0;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.25s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    width: 100%;
+    text-align: left;
+    font-family: 'Sarabun', sans-serif;
+  }
+  .tpl-card:hover {
+    transform: scale(1.02);
+    border-color: rgba(255,255,255,0.7);
+  }
+  .tpl-card-inner {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* ─── Camera ─── */
+  .camera-viewport {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 4/3;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    background: #000;
+  }
+  .camera-viewport video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
+
+  .countdown-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.4);
+    z-index: 10;
+  }
+  .countdown-num {
+    font-size: 120px;
+    font-weight: 900;
+    color: #FFD700;
+    text-shadow: 0 0 40px rgba(255,215,0,0.5);
+    animation: countPulse 1s ease-out;
+  }
+
+  .flash-overlay {
+    position: absolute;
+    inset: 0;
+    background: #FFF;
+    z-index: 20;
+    animation: flashAnim 0.3s ease-out forwards;
+  }
+
+  .capture-btn {
+    margin-top: 24px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #FFF;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    animation: pulse 2s ease-in-out infinite;
+    border: 4px solid #FFD700;
+  }
+  .capture-btn:hover { transform: scale(1.1); }
+  .capture-btn-inner {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+  }
+
+  /* ─── Thumbnails ─── */
+  .thumb-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    min-height: 60px;
+  }
+  .thumb {
+    width: 76px;
+    height: 57px;
+    border-radius: 8px;
+    overflow: hidden;
+    animation: popIn 0.3s ease-out;
+  }
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .thumb-empty {
+    width: 76px;
+    height: 57px;
+    border-radius: 8px;
+    border: 2px dashed rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+  }
+
+  /* ─── Review ─── */
+  .strip-preview {
+    position: relative;
+    width: 100%;
+    max-width: 240px;
+    margin: 0 auto;
+    aspect-ratio: 600/1800;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.4);
+  }
+  .strip-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .thankyou-box {
+    margin-top: 24px;
+    padding: 20px 24px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 16px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .btn-download {
+    width: 100%;
+    max-width: 280px;
+    padding: 14px 24px;
+    background: #FFD700;
+    color: #5D4037;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255,215,0,0.4);
+    transition: all 0.2s;
+    font-family: 'Sarabun', sans-serif;
+  }
+  .btn-download:hover { transform: scale(1.03); }
+
+  .qr-section {
+    margin-top: 24px;
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  .qr-wrapper {
+    display: inline-block;
+    background: #FFF;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+
+  .btn-retake {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50px;
+    padding: 10px 32px;
+    color: #FFF;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Sarabun', sans-serif;
+  }
+  .btn-retake:hover { border-color: rgba(255,255,255,0.7); }
+
+  .cancel-btn {
+    margin-top: 16px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 8px 16px;
+    font-family: 'Sarabun', sans-serif;
+  }
+
+  /* ─── Floating flowers ─── */
+  .floating-flower {
+    position: absolute;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: START                             -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-start" class="screen active app app-default-bg">
+  <!-- Floating decorations -->
+  <div style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden" id="floating-flowers"></div>
+
+  <div class="container">
+    <div style="margin-top:60px;text-align:center;animation:fadeInDown 0.8s ease-out">
+      <div style="font-size:72px;margin-bottom:8px;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3))">🗿</div>
+      <h1 style="font-size:52px;color:#FFF;text-shadow:3px 3px 6px rgba(0,0,0,0.3);margin:0 0 4px 0;font-style:italic;letter-spacing:2px">Aloha</h1>
+      <h2 style="font-size:20px;color:#FFF9C4;text-transform:uppercase;letter-spacing:6px;margin:0 0 24px 0;font-weight:700">Thank You Party</h2>
+      <p style="color:rgba(255,255,255,0.85);font-size:16px;margin:0 0 8px 0">Virtual Photobooth</p>
+      <p style="color:rgba(255,255,255,0.7);font-size:14px;margin:0 0 48px 0">3 April 2026 • WanDeeDee Cafe x Restaurant</p>
+    </div>
+    <button class="btn-start" onclick="showScreen('select')">📸 เริ่มถ่ายรูป</button>
+    <div style="margin-top:40px;display:flex;gap:16px;font-size:28px;opacity:0.6;animation:fadeInUp 1s ease-out 0.6s both">
+      🌴 🌺 🍍 🌊 🌴
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: SELECT TEMPLATE                   -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-select" class="screen app app-default-bg">
+  <div class="container">
+    <h2 style="color:#FFF;font-size:24px;margin:30px 0 8px;text-shadow:2px 2px 4px rgba(0,0,0,0.3)">เลือก Template</h2>
+    <p style="color:rgba(255,255,255,0.8);font-size:14px;margin:0 0 24px">เลือกธีมสำหรับ Photo Strip ของคุณ</p>
+
+    <div id="template-list" style="display:flex;flex-direction:column;gap:16px;width:100%"></div>
+
+    <button class="btn-back" onclick="showScreen('start')">← กลับ</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: CAMERA                            -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-camera" class="screen app">
+  <div class="container">
+    <div id="shot-label" style="color:#FFF;font-size:14px;margin:16px 0 8px;text-transform:uppercase;letter-spacing:3px;opacity:0.8"></div>
+
+    <!-- Progress dots -->
+    <div id="progress-dots" style="display:flex;gap:8px;margin-bottom:16px"></div>
+
+    <!-- Camera viewport -->
+    <div class="camera-viewport" id="camera-box">
+      <video id="video" autoplay playsinline muted></video>
+      <div id="countdown-overlay" class="countdown-overlay" style="display:none">
+        <div id="countdown-num" class="countdown-num"></div>
+      </div>
+      <div id="flash" class="flash-overlay" style="display:none"></div>
+      <div id="camera-error" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:24px;text-align:center;color:#FFF;font-size:14px;background:rgba(0,0,0,0.8)"></div>
+    </div>
+
+    <canvas id="capture-canvas" style="display:none"></canvas>
+
+    <!-- Thumbnails -->
+    <div id="thumb-row" class="thumb-row"></div>
+
+    <!-- Capture button -->
+    <button id="capture-btn" class="capture-btn" onclick="startCountdown()">
+      <div class="capture-btn-inner" id="capture-btn-inner"></div>
+    </button>
+
+    <button class="cancel-btn" onclick="resetAll()">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: REVIEW                            -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-review" class="screen app">
+  <div class="container" style="max-width:420px">
+
+    <!-- Loading state -->
+    <div id="review-loading" style="margin-top:80px;text-align:center;animation:fadeInUp 0.5s ease-out">
+      <div style="font-size:48px;margin-bottom:16px;animation:spin 2s linear infinite">🌺</div>
+      <p style="color:#FFF;font-size:18px;font-family:'Sarabun',sans-serif">กำลังสร้าง Photo Strip...</p>
+    </div>
+
+    <!-- Result (hidden initially) -->
+    <div id="review-result" style="display:none;animation:postcardReveal 1s ease-out">
+      <h2 style="color:#FFF;font-size:20px;text-align:center;margin:20px 0 16px;text-shadow:2px 2px 4px rgba(0,0,0,0.3)">🎉 Photo Strip ของคุณ!</h2>
+
+      <div class="strip-preview" id="strip-preview-box"></div>
+
+      <div class="thankyou-box">
+        <p style="color:#FFD700;font-size:18px;font-weight:700;margin:0 0 8px">Aloha Thank You Party</p>
+        <p style="color:rgba(255,255,255,0.9);font-size:14px;margin:0;line-height:1.6;font-family:'Sarabun',sans-serif">ขอขอบคุณสำหรับความทุ่มเทในไตรมาสที่ผ่านมา</p>
+      </div>
+
+      <div style="margin-top:24px;display:flex;flex-direction:column;gap:12px;align-items:center">
+        <button class="btn-download" onclick="downloadStrip()">💾 ดาวน์โหลด Photo Strip</button>
+      </div>
+
+      <div class="qr-section">
+        <p style="color:rgba(255,255,255,0.85);font-size:13px;margin:0 0 12px;font-family:'Sarabun',sans-serif">สแกน QR Code เพื่อดาวน์โหลดรูป</p>
+        <div class="qr-wrapper" id="qr-code"></div>
+        <p style="color:rgba(255,255,255,0.5);font-size:11px;margin:12px 0 0;word-break:break-all;font-family:'Sarabun',sans-serif">
+          หรือเปิดลิงก์: <a href="https://drive.google.com/drive/folders/1fj4mcwhY9vQjASLgZzbEruam9xICPSxN?usp=sharing" target="_blank" rel="noopener noreferrer" style="color:#FFD700">Google Drive</a>
+        </p>
+      </div>
+
+      <div style="text-align:center;margin-top:20px;padding-bottom:32px">
+        <button class="btn-retake" onclick="resetAll()">🔄 ถ่ายใหม่</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE & CONSTANTS
+// ═══════════════════════════════════════════════
+const STRIP_W = 600, STRIP_H = 1800;
+const PHOTO_POSITIONS = [
+  { x:40, y:180, w:520, h:390 },
+  { x:40, y:600, w:520, h:390 },
+  { x:40, y:1020, w:520, h:390 },
+];
+const DRIVE_URL = "https://drive.google.com/drive/folders/1fj4mcwhY9vQjASLgZzbEruam9xICPSxN?usp=sharing";
+
+const TEMPLATES = [
+  { id:1, name:"Tropical Paradise", desc:"ดอกชบาและใบปาล์ม", accent:"#FF6B35",
+    bg:"linear-gradient(180deg, #FF9A3C 0%, #FF6B35 40%, #E85D26 100%)",
+    frameBorder:"#FFD700",
+    colors:["#FF9A3C","#FF6B35","#E85D26"] },
+  { id:2, name:"Ocean Breeze", desc:"คลื่นทะเลและหอยเปลือก", accent:"#00BCD4",
+    bg:"linear-gradient(180deg, #81D4FA 0%, #00BCD4 40%, #00838F 100%)",
+    frameBorder:"#FFF9C4",
+    colors:["#81D4FA","#00BCD4","#00838F"] },
+  { id:3, name:"Tiki Night", desc:"ค่ำคืนในสวนสวรรค์", accent:"#AB47BC",
+    bg:"linear-gradient(180deg, #1A0033 0%, #4A148C 40%, #AB47BC 100%)",
+    frameBorder:"#FFD54F",
+    colors:["#1A0033","#4A148C","#AB47BC"] },
+];
+
+let state = {
+  screen: "start",
+  selectedTemplate: null,
+  photos: [],
+  currentShot: 0,
+  stream: null,
+  compositeDataUrl: null,
+};
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+document.addEventListener("DOMContentLoaded", () => {
+  createFloatingFlowers();
+  createTemplateCards();
+});
+
+function createFloatingFlowers() {
+  const container = document.getElementById("floating-flowers");
+  for (let i = 0; i < 8; i++) {
+    const div = document.createElement("div");
+    div.className = "floating-flower";
+    div.textContent = "🌺";
+    div.style.left = (10 + (i * 12) % 80) + "%";
+    div.style.top = (5 + (i * 17) % 70) + "%";
+    div.style.fontSize = (20 + (i % 3) * 10) + "px";
+    div.style.opacity = 0.15 + (i % 4) * 0.05;
+    div.style.transform = "rotate(" + (i * 45) + "deg)";
+    div.style.animation = "float" + (i % 3) + " " + (3 + i % 4) + "s ease-in-out infinite";
+    container.appendChild(div);
+  }
+}
+
+function createTemplateCards() {
+  const list = document.getElementById("template-list");
+  TEMPLATES.forEach(tpl => {
+    const btn = document.createElement("button");
+    btn.className = "tpl-card";
+    btn.style.background = tpl.bg;
+    btn.onclick = () => selectTemplate(tpl);
+    btn.innerHTML = `
+      <div class="tpl-card-inner">
+        <div style="width:50px;height:150px;background:${tpl.bg};border-radius:6px;border:2px solid ${tpl.frameBorder};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px;flex-shrink:0">
+          ${[0,1,2].map(() => `<div style="width:36px;height:27px;background:rgba(255,255,255,0.25);border-radius:3px;border:1px ${tpl.id===3?'dashed':'solid'} ${tpl.frameBorder}"></div>`).join("")}
+        </div>
+        <div>
+          <div style="color:#FFF;font-size:18px;font-weight:700;margin-bottom:4px;text-shadow:1px 1px 3px rgba(0,0,0,0.3)">${tpl.name}</div>
+          <div style="color:rgba(255,255,255,0.8);font-size:14px">${tpl.desc}</div>
+        </div>
+        <div style="margin-left:auto;color:rgba(255,255,255,0.6);font-size:24px">→</div>
+      </div>
+    `;
+    list.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN NAVIGATION
+// ═══════════════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("screen-" + name).classList.add("active");
+  state.screen = name;
+}
+
+function selectTemplate(tpl) {
+  state.selectedTemplate = tpl;
+  state.photos = [];
+  state.currentShot = 0;
+
+  const cameraScreen = document.getElementById("screen-camera");
+  cameraScreen.style.background = tpl.bg;
+
+  const cameraBox = document.getElementById("camera-box");
+  cameraBox.style.border = "4px solid " + tpl.frameBorder;
+
+  const captureBtn = document.getElementById("capture-btn");
+  captureBtn.style.borderColor = tpl.frameBorder;
+
+  const btnInner = document.getElementById("capture-btn-inner");
+  btnInner.style.background = tpl.accent;
+
+  showScreen("camera");
+  updateCameraUI();
+  setTimeout(startCamera, 300);
+}
+
+// ═══════════════════════════════════════════════
+//  CAMERA
+// ═══════════════════════════════════════════════
+async function startCamera() {
+  const errEl = document.getElementById("camera-error");
+  errEl.style.display = "none";
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode:"user", width:{ideal:1280}, height:{ideal:960} },
+      audio: false
+    });
+    state.stream = stream;
+    const video = document.getElementById("video");
+    video.srcObject = stream;
+    await video.play();
+  } catch(e) {
+    errEl.textContent = "ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้กล้อง";
+    errEl.style.display = "flex";
+  }
+}
+
+function stopCamera() {
+  if (state.stream) {
+    state.stream.getTracks().forEach(t => t.stop());
+    state.stream = null;
+  }
+}
+
+function capturePhoto() {
+  const video = document.getElementById("video");
+  const canvas = document.getElementById("capture-canvas");
+  if (!video || !canvas) return null;
+
+  canvas.width = 520;
+  canvas.height = 390;
+  const ctx = canvas.getContext("2d");
+
+  const vw = video.videoWidth, vh = video.videoHeight;
+  const targetRatio = 520 / 390;
+  const videoRatio = vw / vh;
+  let sx=0, sy=0, sw=vw, sh=vh;
+  if (videoRatio > targetRatio) { sw = vh * targetRatio; sx = (vw - sw) / 2; }
+  else { sh = vw / targetRatio; sy = (vh - sh) / 2; }
+
+  ctx.save();
+  ctx.translate(canvas.width, 0);
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, 520, 390);
+  ctx.restore();
+
+  return canvas.toDataURL("image/jpeg", 0.92);
+}
+
+// ═══════════════════════════════════════════════
+//  COUNTDOWN & CAPTURE FLOW
+// ═══════════════════════════════════════════════
+function startCountdown() {
+  const captureBtn = document.getElementById("capture-btn");
+  captureBtn.style.display = "none";
+
+  const overlay = document.getElementById("countdown-overlay");
+  const numEl = document.getElementById("countdown-num");
+  overlay.style.display = "flex";
+
+  let count = 3;
+  numEl.textContent = count;
+  numEl.style.animation = "none";
+  void numEl.offsetWidth;
+  numEl.style.animation = "countPulse 1s ease-out";
+
+  const timer = setInterval(() => {
+    count--;
+    if (count > 0) {
+      numEl.textContent = count;
+      numEl.style.animation = "none";
+      void numEl.offsetWidth;
+      numEl.style.animation = "countPulse 1s ease-out";
+    } else {
+      clearInterval(timer);
+      overlay.style.display = "none";
+
+      // Flash
+      const flash = document.getElementById("flash");
+      flash.style.display = "block";
+      flash.style.animation = "none";
+      void flash.offsetWidth;
+      flash.style.animation = "flashAnim 0.3s ease-out forwards";
+      setTimeout(() => { flash.style.display = "none"; }, 300);
+
+      // Capture
+      const dataUrl = capturePhoto();
+      if (dataUrl) {
+        state.photos.push(dataUrl);
+        state.currentShot = state.photos.length;
+        updateCameraUI();
+
+        if (state.photos.length >= 3) {
+          setTimeout(() => {
+            stopCamera();
+            showReview();
+          }, 600);
+        } else {
+          setTimeout(() => {
+            captureBtn.style.display = "flex";
+            startCountdown();
+          }, 1200);
+        }
+      }
+    }
+  }, 1000);
+}
+
+function updateCameraUI() {
+  const tpl = state.selectedTemplate;
+
+  // Shot label
+  document.getElementById("shot-label").textContent =
+    "📸 ถ่ายรูปที่ " + (state.photos.length + 1) + " / 3";
+
+  // Progress dots
+  const dotsContainer = document.getElementById("progress-dots");
+  dotsContainer.innerHTML = "";
+  for (let i = 0; i < 3; i++) {
+    const dot = document.createElement("div");
+    dot.style.height = "12px";
+    dot.style.borderRadius = "6px";
+    dot.style.transition = "all 0.3s";
+    if (i < state.photos.length) {
+      dot.style.width = "40px";
+      dot.style.background = "#FFD700";
+    } else if (i === state.photos.length) {
+      dot.style.width = "12px";
+      dot.style.background = "rgba(255,215,0,0.5)";
+    } else {
+      dot.style.width = "12px";
+      dot.style.background = "rgba(255,255,255,0.3)";
+    }
+    dotsContainer.appendChild(dot);
+  }
+
+  // Thumbnails
+  const thumbRow = document.getElementById("thumb-row");
+  thumbRow.innerHTML = "";
+  state.photos.forEach((p, i) => {
+    const div = document.createElement("div");
+    div.className = "thumb";
+    div.style.border = "2px solid " + tpl.frameBorder;
+    div.innerHTML = `<img src="${p}" alt="Shot ${i+1}">`;
+    thumbRow.appendChild(div);
+  });
+  for (let i = state.photos.length; i < 3; i++) {
+    const div = document.createElement("div");
+    div.className = "thumb-empty";
+    div.textContent = i + 1;
+    thumbRow.appendChild(div);
+  }
+
+  // Show/hide capture button
+  const captureBtn = document.getElementById("capture-btn");
+  captureBtn.style.display = state.photos.length < 3 ? "flex" : "none";
+}
+
+// ═══════════════════════════════════════════════
+//  REVIEW / COMPOSITE
+// ═══════════════════════════════════════════════
+function showReview() {
+  const tpl = state.selectedTemplate;
+  const reviewScreen = document.getElementById("screen-review");
+  reviewScreen.style.background = tpl.bg;
+
+  document.getElementById("review-loading").style.display = "block";
+  document.getElementById("review-result").style.display = "none";
+
+  showScreen("review");
+
+  setTimeout(() => composeStrip(), 200);
+}
+
+async function composeStrip() {
+  const tpl = state.selectedTemplate;
+  const canvas = document.createElement("canvas");
+  canvas.width = STRIP_W;
+  canvas.height = STRIP_H;
+  const ctx = canvas.getContext("2d");
+
+  // Background gradient
+  const grd = ctx.createLinearGradient(0, 0, 0, STRIP_H);
+  grd.addColorStop(0, tpl.colors[0]);
+  grd.addColorStop(0.4, tpl.colors[1]);
+  grd.addColorStop(1, tpl.colors[2]);
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, STRIP_W, STRIP_H);
+
+  // Title text
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "bold 56px 'Georgia', serif";
+  ctx.fillText("Aloha", STRIP_W / 2, 80);
+  ctx.font = "bold 32px 'Georgia', serif";
+  ctx.fillText("THANK YOU PARTY", STRIP_W / 2, 130);
+
+  // Draw photos
+  for (let i = 0; i < 3; i++) {
+    const pos = PHOTO_POSITIONS[i];
+    // Frame border
+    ctx.strokeStyle = tpl.frameBorder;
+    ctx.lineWidth = 4;
+    if (tpl.id === 3) ctx.setLineDash([12, 4]);
+    else ctx.setLineDash([]);
+    ctx.strokeRect(pos.x - 4, pos.y - 4, pos.w + 8, pos.h + 8);
+    ctx.setLineDash([]);
+
+    // Photo
+    const img = new Image();
+    img.src = state.photos[i];
+    await new Promise(res => { img.onload = res; img.onerror = res; });
+    ctx.drawImage(img, pos.x, pos.y, pos.w, pos.h);
+  }
+
+  // Bottom text
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "bold 30px 'Sarabun', sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("ขอขอบคุณสำหรับ", STRIP_W / 2, 1480);
+  ctx.fillText("ความทุ่มเทในไตรมาสที่ผ่านมา", STRIP_W / 2, 1520);
+
+  // Date
+  ctx.font = "22px 'Sarabun', sans-serif";
+  ctx.fillText("3 April 2026 | WanDeeDee Cafe", STRIP_W / 2, 1570);
+
+  // Decorative circles
+  ctx.fillStyle = "#FFFFFF";
+  [[60,590],[540,590],[80,1010],[520,1010],[120,1610],[480,1610]].forEach(([cx,cy]) => {
+    ctx.beginPath();
+    ctx.arc(cx, cy, 8, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  state.compositeDataUrl = canvas.toDataURL("image/png");
+
+  // Show result
+  document.getElementById("review-loading").style.display = "none";
+  const result = document.getElementById("review-result");
+  result.style.display = "block";
+  result.style.animation = "none";
+  void result.offsetWidth;
+  result.style.animation = "postcardReveal 1s ease-out";
+
+  // Strip preview image
+  const previewBox = document.getElementById("strip-preview-box");
+  previewBox.style.background = tpl.bg;
+  previewBox.innerHTML = `<img src="${state.compositeDataUrl}" alt="Photo Strip">`;
+
+  // QR Code
+  const qrEl = document.getElementById("qr-code");
+  qrEl.innerHTML = "";
+  new QRCode(qrEl, {
+    text: DRIVE_URL,
+    width: 140,
+    height: 140,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.M,
+  });
+}
+
+function downloadStrip() {
+  if (!state.compositeDataUrl) return;
+  const a = document.createElement("a");
+  a.href = state.compositeDataUrl;
+  a.download = "aloha-photobooth.png";
+  a.click();
+}
+
+// ═══════════════════════════════════════════════
+//  RESET
+// ═══════════════════════════════════════════════
+function resetAll() {
+  stopCamera();
+  state.selectedTemplate = null;
+  state.photos = [];
+  state.currentShot = 0;
+  state.compositeDataUrl = null;
+  showScreen("start");
+}
+</script>
+</body>
+</html>
