@@ -8,254 +8,101 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-  :root {
-    --gold: #FFD700;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html, body { height:100%; overflow-x:hidden; }
-  body {
-    font-family: 'Sarabun', 'Georgia', serif;
-    -webkit-font-smoothing: antialiased;
-    background: #E85D26;
-  }
+  :root { --gold:#FFD700; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow-x:hidden}
+  body{font-family:'Sarabun','Georgia',serif;-webkit-font-smoothing:antialiased;background:#E85D26}
 
-  /* ─── Screen System ─── */
-  .screen {
-    display: none;
-    width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .screen.active { display: flex; }
-  .screen-inner {
-    width: 100%;
-    max-width: 460px;
-    padding: 20px 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    z-index: 2;
-  }
+  .screen{display:none;width:100%;min-height:100vh;min-height:100dvh;flex-direction:column;align-items:center;position:relative;overflow:hidden}
+  .screen.active{display:flex}
+  .screen-inner{width:100%;max-width:460px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:2}
 
-  /* Subtle noise overlay */
-  .screen::before {
-    content: '';
-    position: absolute; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 1;
-  }
+  .screen::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1}
 
-  /* ─── Backgrounds ─── */
-  .bg-tropical { background: linear-gradient(160deg, #FFB347 0%, #FF6B35 35%, #E85D26 70%, #D44E1C 100%); }
-  .bg-ocean    { background: linear-gradient(160deg, #81D4FA 0%, #26C6DA 35%, #00838F 70%, #006064 100%); }
-  .bg-tiki     { background: linear-gradient(160deg, #2D004F 0%, #4A148C 35%, #7B1FA2 70%, #AB47BC 100%); }
+  .bg-tropical{background:linear-gradient(160deg,#FFB347 0%,#FF6B35 35%,#E85D26 70%,#D44E1C 100%)}
 
-  /* ─── Floating Deco ─── */
-  .deco-layer { position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
-  .deco-item { position:absolute; will-change:transform; }
+  .deco-layer{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .deco-item{position:absolute;will-change:transform}
 
-  /* ─── Animations ─── */
-  @keyframes fadeSlideDown { from{opacity:0;transform:translateY(-36px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeSlideUp   { from{opacity:0;transform:translateY(36px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes gentleFloat {
-    0%,100% { transform:translateY(0) rotate(var(--r,0deg)); }
-    50%     { transform:translateY(var(--fy,-12px)) rotate(calc(var(--r,0deg)+8deg)); }
-  }
-  @keyframes countPulse  { 0%{transform:scale(.2);opacity:0} 50%{transform:scale(1.15);opacity:1} 100%{transform:scale(1);opacity:1} }
-  @keyframes flashBang   { 0%{opacity:1} 100%{opacity:0} }
-  @keyframes popIn       { 0%{transform:scale(.4);opacity:0} 70%{transform:scale(1.08)} 100%{transform:scale(1);opacity:1} }
-  @keyframes breathe {
-    0%,100% { box-shadow:0 4px 20px rgba(0,0,0,.25),0 0 0 0 rgba(255,215,0,.4); }
-    50%     { box-shadow:0 4px 28px rgba(0,0,0,.3),0 0 0 10px rgba(255,215,0,0); }
-  }
-  @keyframes spin         { to{transform:rotate(360deg)} }
-  @keyframes postcardFlip { 0%{opacity:0;transform:perspective(1000px) rotateY(80deg) scale(.6)} 50%{opacity:1;transform:perspective(1000px) rotateY(-8deg) scale(1.02)} 100%{transform:perspective(1000px) rotateY(0) scale(1)} }
-  @keyframes shimmer {
-    0%{background-position:-200% center} 100%{background-position:200% center}
-  }
+  @keyframes fadeSlideDown{from{opacity:0;transform:translateY(-36px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeSlideUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes gentleFloat{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(var(--fy,-12px)) rotate(calc(var(--r,0deg)+8deg))}}
+  @keyframes countPulse{0%{transform:scale(.2);opacity:0}50%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
+  @keyframes flashBang{0%{opacity:1}100%{opacity:0}}
+  @keyframes popIn{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+  @keyframes breathe{0%,100%{box-shadow:0 4px 20px rgba(0,0,0,.25),0 0 0 0 rgba(255,215,0,.4)}50%{box-shadow:0 4px 28px rgba(0,0,0,.3),0 0 0 10px rgba(255,215,0,0)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes postcardFlip{0%{opacity:0;transform:perspective(1000px) rotateY(80deg) scale(.6)}50%{opacity:1;transform:perspective(1000px) rotateY(-8deg) scale(1.02)}100%{transform:perspective(1000px) rotateY(0) scale(1)}}
+  @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
 
-  /* ─── Typography ─── */
-  .title-aloha {
-    font-family: 'Pacifico', cursive;
-    font-size: clamp(48px,12vw,64px);
-    color: #FFF;
-    text-shadow: 3px 4px 8px rgba(0,0,0,.25), 0 0 40px rgba(255,165,0,.2);
-    line-height: 1;
-  }
-  .title-sub {
-    font-size: clamp(16px,4.5vw,22px);
-    color: #FFF9C4;
-    text-transform: uppercase;
-    letter-spacing: 6px;
-    font-weight: 800;
-    text-shadow: 1px 2px 4px rgba(0,0,0,.2);
-  }
+  .title-aloha{font-family:'Pacifico',cursive;font-size:clamp(48px,12vw,64px);color:#FFF;text-shadow:3px 4px 8px rgba(0,0,0,.25),0 0 40px rgba(255,165,0,.2);line-height:1}
+  .title-sub{font-size:clamp(16px,4.5vw,22px);color:#FFF9C4;text-transform:uppercase;letter-spacing:6px;font-weight:800;text-shadow:1px 2px 4px rgba(0,0,0,.2)}
 
-  /* ─── Buttons ─── */
-  .btn-primary {
-    background: rgba(255,255,255,.95);
-    color: #E85D26;
-    border: none; border-radius: 60px;
-    padding: 18px 52px; font-size: 19px; font-weight: 700;
-    font-family: 'Sarabun', sans-serif;
-    cursor: pointer;
-    box-shadow: 0 8px 32px rgba(0,0,0,.18), inset 0 -2px 0 rgba(0,0,0,.06);
-    letter-spacing: .5px;
-    transition: transform .2s, box-shadow .2s;
-    position: relative; overflow: hidden;
-  }
-  .btn-primary::after {
-    content:''; position:absolute; inset:0;
-    background: linear-gradient(90deg,transparent 30%,rgba(255,255,255,.4) 50%,transparent 70%);
-    background-size:200% 100%;
-    animation: shimmer 3s ease-in-out infinite;
-  }
-  .btn-primary:hover,.btn-primary:active { transform:scale(1.04); box-shadow:0 12px 40px rgba(0,0,0,.25); }
+  .btn-primary{background:rgba(255,255,255,.95);color:#E85D26;border:none;border-radius:60px;padding:18px 52px;font-size:19px;font-weight:700;font-family:'Sarabun',sans-serif;cursor:pointer;box-shadow:0 8px 32px rgba(0,0,0,.18),inset 0 -2px 0 rgba(0,0,0,.06);letter-spacing:.5px;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+  .btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 30%,rgba(255,255,255,.4) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 3s ease-in-out infinite}
+  .btn-primary:hover,.btn-primary:active{transform:scale(1.04);box-shadow:0 12px 40px rgba(0,0,0,.25)}
 
-  .btn-ghost {
-    background:transparent; border:2px solid rgba(255,255,255,.35);
-    border-radius:50px; padding:11px 32px;
-    color:#FFF; font-size:14px; font-family:'Sarabun',sans-serif;
-    cursor:pointer; transition:all .2s; backdrop-filter:blur(4px);
-  }
-  .btn-ghost:hover { border-color:rgba(255,255,255,.7); background:rgba(255,255,255,.08); }
+  .btn-ghost{background:transparent;border:2px solid rgba(255,255,255,.35);border-radius:50px;padding:11px 32px;color:#FFF;font-size:14px;font-family:'Sarabun',sans-serif;cursor:pointer;transition:all .2s;backdrop-filter:blur(4px)}
+  .btn-ghost:hover{border-color:rgba(255,255,255,.7);background:rgba(255,255,255,.08)}
 
-  .btn-gold {
-    width:100%; max-width:280px;
-    padding:15px 24px;
-    background:linear-gradient(135deg,#FFD700,#FFC107);
-    color:#5D4037; border:none; border-radius:50px;
-    font-size:16px; font-weight:700; font-family:'Sarabun',sans-serif;
-    cursor:pointer; box-shadow:0 4px 20px rgba(255,193,7,.4);
-    transition:transform .2s;
-  }
-  .btn-gold:hover { transform:scale(1.03); }
+  .btn-gold{width:100%;max-width:280px;padding:15px 24px;background:linear-gradient(135deg,#FFD700,#FFC107);color:#5D4037;border:none;border-radius:50px;font-size:16px;font-weight:700;font-family:'Sarabun',sans-serif;cursor:pointer;box-shadow:0 4px 20px rgba(255,193,7,.4);transition:transform .2s}
+  .btn-gold:hover{transform:scale(1.03)}
 
-  .btn-cancel {
-    margin-top:16px; background:transparent; border:none;
-    color:rgba(255,255,255,.55); font-size:13px;
-    cursor:pointer; padding:8px 16px; font-family:'Sarabun',sans-serif;
-    transition:color .2s;
-  }
-  .btn-cancel:hover { color:rgba(255,255,255,.85); }
+  .btn-cancel{margin-top:16px;background:transparent;border:none;color:rgba(255,255,255,.55);font-size:13px;cursor:pointer;padding:8px 16px;font-family:'Sarabun',sans-serif;transition:color .2s}
+  .btn-cancel:hover{color:rgba(255,255,255,.85)}
 
-  /* ─── Template Cards ─── */
-  .tpl-card {
-    width:100%;
-    border:2.5px solid rgba(255,255,255,.25);
-    border-radius:18px; padding:0;
-    cursor:pointer; overflow:hidden;
-    transition:all .25s cubic-bezier(.4,0,.2,1);
-    box-shadow:0 4px 24px rgba(0,0,0,.15);
-    text-align:left; font-family:'Sarabun',sans-serif;
-    position:relative;
-  }
-  .tpl-card::after {
-    content:'→'; position:absolute; right:20px; top:50%;
-    transform:translateY(-50%);
-    color:rgba(255,255,255,.5); font-size:22px; transition:all .25s;
-  }
-  .tpl-card:hover { transform:translateY(-2px) scale(1.015); border-color:rgba(255,255,255,.6); box-shadow:0 8px 32px rgba(0,0,0,.25); }
-  .tpl-card:hover::after { right:16px; color:rgba(255,255,255,.8); }
-  .tpl-card:active { transform:scale(.98); }
-  .tpl-inner { padding:18px 50px 18px 20px; display:flex; align-items:center; gap:16px; }
-  .tpl-mini-strip {
-    width:48px; height:144px; border-radius:6px;
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    gap:4px; padding:6px 4px; flex-shrink:0;
-  }
-  .tpl-mini-frame { width:34px; height:26px; background:rgba(255,255,255,.22); border-radius:3px; }
-  .tpl-name { color:#FFF; font-size:17px; font-weight:700; margin-bottom:3px; text-shadow:1px 1px 3px rgba(0,0,0,.25); }
-  .tpl-desc { color:rgba(255,255,255,.75); font-size:13px; }
+  /* Template cards */
+  .tpl-card{width:100%;border:2.5px solid rgba(255,255,255,.25);border-radius:18px;padding:0;cursor:pointer;overflow:hidden;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 24px rgba(0,0,0,.15);text-align:left;font-family:'Sarabun',sans-serif;position:relative}
+  .tpl-card::after{content:'→';position:absolute;right:20px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.5);font-size:22px;transition:all .25s}
+  .tpl-card:hover{transform:translateY(-2px) scale(1.015);border-color:rgba(255,255,255,.6);box-shadow:0 8px 32px rgba(0,0,0,.25)}
+  .tpl-card:hover::after{right:16px;color:rgba(255,255,255,.8)}
+  .tpl-card:active{transform:scale(.98)}
+  .tpl-inner{padding:18px 50px 18px 20px;display:flex;align-items:center;gap:16px}
+  .tpl-preview{width:60px;height:180px;border-radius:8px;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .tpl-preview img{width:100%;height:100%;object-fit:cover}
+  .tpl-name{color:#FFF;font-size:17px;font-weight:700;margin-bottom:3px;text-shadow:1px 1px 3px rgba(0,0,0,.25)}
+  .tpl-desc{color:rgba(255,255,255,.75);font-size:13px}
 
-  /* ─── Camera ─── */
-  .cam-box {
-    position:relative; width:100%; max-width:400px;
-    aspect-ratio:4/3; border-radius:18px;
-    overflow:hidden; box-shadow:0 8px 36px rgba(0,0,0,.3); background:#111;
-  }
-  .cam-box video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); }
-  .cam-overlay { position:absolute; inset:0; display:none; align-items:center; justify-content:center; z-index:10; }
-  .cam-overlay.on { display:flex; }
-  .countdown-bg { background:rgba(0,0,0,.45); backdrop-filter:blur(2px); }
-  .countdown-num {
-    font-size:min(120px,25vw); font-weight:900;
-    color:var(--gold);
-    text-shadow:0 0 60px rgba(255,215,0,.5),0 4px 12px rgba(0,0,0,.3);
-  }
-  .flash-bg { background:#FFF; z-index:20; }
-  .error-bg { background:rgba(0,0,0,.85); padding:24px; text-align:center; color:#FFF; font-size:15px; }
+  /* Camera */
+  .cam-box{position:relative;width:100%;max-width:400px;aspect-ratio:4/3;border-radius:18px;overflow:hidden;box-shadow:0 8px 36px rgba(0,0,0,.3);background:#111;border:4px solid var(--gold)}
+  .cam-box video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+  .cam-overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:10}
+  .cam-overlay.on{display:flex}
+  .countdown-bg{background:rgba(0,0,0,.45);backdrop-filter:blur(2px)}
+  .countdown-num{font-size:min(120px,25vw);font-weight:900;color:var(--gold);text-shadow:0 0 60px rgba(255,215,0,.5),0 4px 12px rgba(0,0,0,.3)}
+  .flash-bg{background:#FFF;z-index:20}
+  .error-bg{background:rgba(0,0,0,.85);padding:24px;text-align:center;color:#FFF;font-size:15px}
 
-  .shutter-btn {
-    margin-top:28px; width:78px; height:78px; border-radius:50%;
-    background:#FFF; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    transition:transform .15s;
-    animation:breathe 2.5s ease-in-out infinite;
-    border:none; position:relative;
-  }
-  .shutter-btn::before {
-    content:''; position:absolute; width:88px; height:88px;
-    border-radius:50%; border:3px solid rgba(255,255,255,.5);
-  }
-  .shutter-btn-inner { width:58px; height:58px; border-radius:50%; }
-  .shutter-btn:hover { transform:scale(1.08); }
-  .shutter-btn:active { transform:scale(.95); }
+  .shutter-btn{margin-top:28px;width:78px;height:78px;border-radius:50%;background:#FFF;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s;animation:breathe 2.5s ease-in-out infinite;border:none;position:relative}
+  .shutter-btn::before{content:'';position:absolute;width:88px;height:88px;border-radius:50%;border:3px solid rgba(255,255,255,.5)}
+  .shutter-btn-inner{width:58px;height:58px;border-radius:50%;background:#FF6B35}
+  .shutter-btn:hover{transform:scale(1.08)}
+  .shutter-btn:active{transform:scale(.95)}
 
-  /* Dots & Thumbs */
-  .dot-row { display:flex; gap:8px; margin-bottom:18px; }
-  .dot { height:10px; border-radius:5px; transition:all .4s cubic-bezier(.4,0,.2,1); }
-  .dot.done    { width:36px; background:var(--gold); }
-  .dot.current { width:14px; background:rgba(255,215,0,.5); }
-  .dot.pending { width:10px; background:rgba(255,255,255,.25); }
+  .dot-row{display:flex;gap:8px;margin-bottom:18px}
+  .dot{height:10px;border-radius:5px;transition:all .4s cubic-bezier(.4,0,.2,1)}
+  .dot.done{width:36px;background:var(--gold)}
+  .dot.current{width:14px;background:rgba(255,215,0,.5)}
+  .dot.pending{width:10px;background:rgba(255,255,255,.25)}
 
-  .thumb-row { display:flex; gap:8px; margin-top:18px; min-height:58px; }
-  .thumb { width:74px; height:56px; border-radius:8px; overflow:hidden; animation:popIn .35s ease-out; }
-  .thumb img { width:100%; height:100%; object-fit:cover; }
-  .thumb-empty {
-    width:74px; height:56px; border-radius:8px;
-    border:2px dashed rgba(255,255,255,.25);
-    display:flex; align-items:center; justify-content:center;
-    color:rgba(255,255,255,.35); font-size:13px; font-weight:600;
-  }
+  .thumb-row{display:flex;gap:8px;margin-top:18px;min-height:58px}
+  .thumb{width:74px;height:56px;border-radius:8px;overflow:hidden;animation:popIn .35s ease-out;border:2px solid var(--gold)}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .thumb-empty{width:74px;height:56px;border-radius:8px;border:2px dashed rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.35);font-size:13px;font-weight:600}
 
-  /* ─── Review ─── */
-  .strip-preview {
-    width:100%; max-width:220px; margin:0 auto;
-    aspect-ratio:600/1800; border-radius:14px; overflow:hidden;
-    box-shadow:0 16px 56px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.1);
-  }
-  .strip-preview img { width:100%; height:100%; object-fit:cover; }
+  /* Review */
+  .strip-preview{width:100%;max-width:220px;margin:0 auto;aspect-ratio:600/1800;border-radius:14px;overflow:hidden;box-shadow:0 16px 56px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.1)}
+  .strip-preview img{width:100%;height:100%;object-fit:cover}
 
-  .glass-card {
-    margin-top:24px; padding:22px 24px;
-    background:rgba(255,255,255,.1);
-    border-radius:18px; text-align:center;
-    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-    border:1px solid rgba(255,255,255,.15);
-    width:100%;
-  }
-  .qr-wrapper {
-    display:inline-block; background:#FFF;
-    padding:14px; border-radius:14px;
-    box-shadow:0 4px 20px rgba(0,0,0,.2);
-  }
+  .glass-card{margin-top:24px;padding:22px 24px;background:rgba(255,255,255,.1);border-radius:18px;text-align:center;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);width:100%}
+  .qr-wrapper{display:inline-block;background:#FFF;padding:14px;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.2)}
 
-  @media(max-width:380px) {
-    .screen-inner { padding:16px 12px; }
-    .btn-primary { padding:16px 40px; font-size:17px; }
-  }
+  @media(max-width:380px){.screen-inner{padding:16px 12px}.btn-primary{padding:16px 40px;font-size:17px}}
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════ START ════════════════════════════ -->
+<!-- ════════════════ START ════════════════ -->
 <div id="screen-start" class="screen active bg-tropical">
   <div class="deco-layer" id="start-deco"></div>
   <div class="screen-inner" style="padding-top:0">
@@ -277,7 +124,7 @@
   </div>
 </div>
 
-<!-- ════════════════════════════ SELECT ════════════════════════════ -->
+<!-- ════════════════ SELECT ════════════════ -->
 <div id="screen-select" class="screen bg-tropical">
   <div class="deco-layer"></div>
   <div class="screen-inner">
@@ -290,8 +137,8 @@
   </div>
 </div>
 
-<!-- ════════════════════════════ CAMERA ════════════════════════════ -->
-<div id="screen-camera" class="screen">
+<!-- ════════════════ CAMERA ════════════════ -->
+<div id="screen-camera" class="screen bg-tropical">
   <div class="deco-layer"></div>
   <div class="screen-inner">
     <div id="shot-label" style="color:#FFF;font-size:13px;margin:18px 0 10px;text-transform:uppercase;letter-spacing:3px;opacity:.75;font-weight:600"></div>
@@ -311,8 +158,8 @@
   </div>
 </div>
 
-<!-- ════════════════════════════ REVIEW ════════════════════════════ -->
-<div id="screen-review" class="screen">
+<!-- ════════════════ REVIEW ════════════════ -->
+<div id="screen-review" class="screen bg-tropical">
   <div class="deco-layer"></div>
   <div class="screen-inner" style="max-width:400px">
     <div id="rv-load" style="margin-top:clamp(60px,15vh,100px);text-align:center;animation:fadeSlideUp .5s ease-out">
@@ -329,7 +176,6 @@
       <div style="margin-top:24px;display:flex;flex-direction:column;align-items:center">
         <button class="btn-gold" onclick="dlStrip()">💾 ดาวน์โหลด Photo Strip</button>
       </div>
-      <!-- QR / Upload area -->
       <div id="qr-area" class="glass-card" style="margin-top:20px">
         <div id="qr-status" style="text-align:center">
           <div style="font-size:36px;margin-bottom:8px;animation:spin 1.2s linear infinite">⏳</div>
@@ -345,92 +191,124 @@
 
 <script>
 /* ═══════════ CONSTANTS ═══════════ */
-const SW=600,SH=1800;
-const PP=[{x:40,y:180,w:520,h:390},{x:40,y:600,w:520,h:390},{x:40,y:1020,w:520,h:390}];
+const FW=600, FH=1800;
 
-// ⚠️ วาง URL ของ Google Apps Script ที่ Deploy แล้วตรงนี้
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxOYOhhBpd_3KlXhG3CwB2bcbw3oHDSUnIQVM1FGqjoofRumZmXh4-MXV1Up0WxHOk5A/exec';
+// ⚠️ Google Apps Script URL
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNrTsHoPahfhPBn2uIDDhCjtv1PNUSHFbU9RAWXChTCB4b5lhLYOlNsYGY10iuWxI/exec';
 
-let driveUrl = null; // เก็บลิงก์ไว้ใช้ซ้ำ
+let driveUrl = null;
 
-const TPL=[
-  {id:1,name:"Tropical Paradise",desc:"ดอกชบาและใบปาล์ม",accent:"#FF6B35",bg:"bg-tropical",fb:"#FFD700",
-   bgCSS:"linear-gradient(160deg,#FFB347 0%,#FF6B35 35%,#E85D26 70%,#D44E1C 100%)",
-   c:["#FF9A3C","#FF6B35","#E85D26"],dash:false},
-  {id:2,name:"Ocean Breeze",desc:"คลื่นทะเลและหอยเปลือก",accent:"#00BCD4",bg:"bg-ocean",fb:"#FFF9C4",
-   bgCSS:"linear-gradient(160deg,#81D4FA 0%,#26C6DA 35%,#00838F 70%,#006064 100%)",
-   c:["#81D4FA","#00BCD4","#00838F"],dash:false},
-  {id:3,name:"Tiki Night",desc:"ค่ำคืนในสวนสวรรค์",accent:"#AB47BC",bg:"bg-tiki",fb:"#FFD54F",
-   bgCSS:"linear-gradient(160deg,#2D004F 0%,#4A148C 35%,#7B1FA2 70%,#AB47BC 100%)",
-   c:["#1A0033","#4A148C","#AB47BC"],dash:true}
+/* ═══════════ FRAME TEMPLATES ═══════════ */
+const TEMPLATES = [
+  {
+    id: 1,
+    name: "Aloha Beach",
+    desc: "ชายหาดและสัตว์ทะเล",
+    src: "frame_aloha.png",
+    accent: "#FF6B35",
+    bgClass: "bg-tropical",
+    bgCSS: "linear-gradient(160deg,#FFB347 0%,#FF6B35 35%,#E85D26 70%,#D44E1C 100%)",
+    slots: [
+      { x:137, y:216, w:333, h:323 },
+      { x:100, y:591, w:389, h:388 },
+      { x:167, y:1092, w:281, h:365 },
+    ],
+    imgObj: null,
+  },
+  {
+    id: 2,
+    name: "Summer Holiday",
+    desc: "กระดาษฉีกสไตล์ซัมเมอร์",
+    src: "frame_summer.png",
+    accent: "#E8A0BF",
+    bgClass: "bg-tropical",
+    bgCSS: "linear-gradient(160deg,#FCEABB 0%,#F8B500 35%,#F09819 70%,#E85D26 100%)",
+    slots: [
+      { x:51, y:266, w:497, h:382 },
+      { x:51, y:691, w:497, h:372 },
+      { x:51, y:1101, w:497, h:367 },
+    ],
+    imgObj: null,
+  },
 ];
 
-let S={tpl:null,pics:[],stream:null,comp:null};
+let S = { tpl:null, pics:[], stream:null, comp:null };
 
 /* ═══════════ INIT ═══════════ */
-document.addEventListener("DOMContentLoaded",()=>{
-  // floating flowers
-  const layer=document.getElementById("start-deco");
-  ['🌺','🌸','🌼','🏵️','🌺','🌺','🌸','🌺'].forEach((e,i)=>{
-    const d=document.createElement("div");
-    d.className="deco-item"; d.textContent=e;
-    d.style.cssText=`left:${8+(i*13)%82}%;top:${4+(i*15)%68}%;font-size:${18+(i%3)*10}px;opacity:${.08+(i%4)*.04};--r:${i*40}deg;--fy:${-8-(i%3)*6}px;animation:gentleFloat ${3.5+i%3}s ease-in-out ${i*.3}s infinite`;
+document.addEventListener("DOMContentLoaded", () => {
+  // Floating flowers
+  const layer = document.getElementById("start-deco");
+  ['🌺','🌸','🌼','🏵️','🌺','🌺','🌸','🌺'].forEach((e,i) => {
+    const d = document.createElement("div");
+    d.className = "deco-item"; d.textContent = e;
+    d.style.cssText = `left:${8+(i*13)%82}%;top:${4+(i*15)%68}%;font-size:${18+(i%3)*10}px;opacity:${.08+(i%4)*.04};--r:${i*40}deg;--fy:${-8-(i%3)*6}px;animation:gentleFloat ${3.5+i%3}s ease-in-out ${i*.3}s infinite`;
     layer.appendChild(d);
   });
-  // template cards
-  const list=document.getElementById("tpl-list");
-  TPL.forEach((t,i)=>{
-    const b=document.createElement("button");
-    b.className="tpl-card"; b.style.background=t.bgCSS;
-    b.style.animation=`fadeSlideUp .5s ease-out ${.1+i*.1}s both`;
-    b.onclick=()=>pickTpl(t);
-    const bs=t.dash?'dashed':'solid';
-    b.innerHTML=`<div class="tpl-inner">
-      <div class="tpl-mini-strip" style="background:${t.bgCSS};border:2px solid ${t.fb}">
-        <div class="tpl-mini-frame" style="border:1px ${bs} ${t.fb}"></div>
-        <div class="tpl-mini-frame" style="border:1px ${bs} ${t.fb}"></div>
-        <div class="tpl-mini-frame" style="border:1px ${bs} ${t.fb}"></div>
-      </div>
-      <div><div class="tpl-name">${t.name}</div><div class="tpl-desc">${t.desc}</div></div>
-    </div>`;
-    list.appendChild(b);
+
+  // Preload frame images
+  TEMPLATES.forEach(t => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = t.src;
+    img.onload = () => { t.imgObj = img; console.log("Loaded frame:", t.src); };
+    img.onerror = () => console.error("Failed to load frame:", t.src);
+  });
+
+  // Build template cards
+  const list = document.getElementById("tpl-list");
+  TEMPLATES.forEach((t, i) => {
+    const card = document.createElement("button");
+    card.className = "tpl-card";
+    card.style.background = t.bgCSS;
+    card.style.animation = `fadeSlideUp .5s ease-out ${.1+i*.12}s both`;
+    card.onclick = () => pickTpl(t);
+    card.innerHTML = `
+      <div class="tpl-inner">
+        <div class="tpl-preview"><img src="${t.src}" alt="${t.name}"></div>
+        <div>
+          <div class="tpl-name">${t.name}</div>
+          <div class="tpl-desc">${t.desc}</div>
+        </div>
+      </div>`;
+    list.appendChild(card);
   });
 });
 
 /* ═══════════ NAV ═══════════ */
-function go(n){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+function go(n) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("screen-"+n).classList.add("active");
   window.scrollTo(0,0);
 }
 
-function pickTpl(t){
-  S.tpl=t; S.pics=[];
-  ["screen-camera","screen-review"].forEach(id=>{
-    document.getElementById(id).className="screen "+t.bg;
-  });
-  document.getElementById("cam-box").style.border="4px solid "+t.fb;
-  document.getElementById("shutter-inner").style.background=t.accent;
-  go("camera"); updCam(); setTimeout(startCam,250);
+function pickTpl(t) {
+  S.tpl = t; S.pics = [];
+  go("camera"); updCam();
+  setTimeout(startCam, 250);
 }
 
 /* ═══════════ CAMERA ═══════════ */
-async function startCam(){
-  const er=document.getElementById("err-layer"); er.classList.remove("on");
-  try{
-    const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280},height:{ideal:960}},audio:false});
-    S.stream=s;
-    const v=document.getElementById("video"); v.srcObject=s; await v.play();
-  }catch(e){
-    er.textContent="ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้กล้อง"; er.classList.add("on");
+async function startCam() {
+  const er = document.getElementById("err-layer"); er.classList.remove("on");
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:"user", width:{ideal:1280}, height:{ideal:960} }, audio:false
+    });
+    S.stream = s;
+    const v = document.getElementById("video"); v.srcObject = s; await v.play();
+  } catch(e) {
+    er.textContent = "ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้กล้อง";
+    er.classList.add("on");
   }
 }
-function stopCam(){ if(S.stream){S.stream.getTracks().forEach(t=>t.stop());S.stream=null;} }
+function stopCam() { if(S.stream){S.stream.getTracks().forEach(t=>t.stop());S.stream=null;} }
 
-function snap(){
-  const v=document.getElementById("video"),c=document.getElementById("cap-canvas");
-  c.width=520;c.height=390;
-  const ctx=c.getContext("2d"),vw=v.videoWidth,vh=v.videoHeight,r=520/390,vr=vw/vh;
+function snap() {
+  const v = document.getElementById("video"), c = document.getElementById("cap-canvas");
+  // Capture at slot aspect ratio of current template's first slot (roughly 4:3)
+  c.width = 520; c.height = 390;
+  const ctx = c.getContext("2d"), vw = v.videoWidth, vh = v.videoHeight;
+  const r = 520/390, vr = vw/vh;
   let sx=0,sy=0,sw=vw,sh=vh;
   if(vr>r){sw=vh*r;sx=(vw-sw)/2}else{sh=vw/r;sy=(vh-sh)/2}
   ctx.save();ctx.translate(520,0);ctx.scale(-1,1);
@@ -439,21 +317,19 @@ function snap(){
 }
 
 /* ═══════════ COUNTDOWN ═══════════ */
-function doCountdown(){
-  const btn=document.getElementById("shutter"); btn.style.display="none";
-  const ol=document.getElementById("cd-layer"),nm=document.getElementById("cd-num");
+function doCountdown() {
+  const btn = document.getElementById("shutter"); btn.style.display = "none";
+  const ol = document.getElementById("cd-layer"), nm = document.getElementById("cd-num");
   ol.classList.add("on");
-  let ct=3; nm.textContent=ct; reA(nm,"countPulse .9s ease-out");
-  const ti=setInterval(()=>{
+  let ct = 3; nm.textContent = ct; reA(nm,"countPulse .9s ease-out");
+  const ti = setInterval(() => {
     ct--;
     if(ct>0){ nm.textContent=ct; reA(nm,"countPulse .9s ease-out"); }
-    else{
+    else {
       clearInterval(ti); ol.classList.remove("on");
-      // flash
-      const fl=document.getElementById("fl-layer");
+      const fl = document.getElementById("fl-layer");
       fl.classList.add("on"); reA(fl,"flashBang .35s ease-out forwards");
       setTimeout(()=>fl.classList.remove("on"),350);
-      // capture
       S.pics.push(snap()); updCam();
       if(S.pics.length>=3) setTimeout(()=>{stopCam();goReview();},700);
       else setTimeout(()=>{btn.style.display="flex";doCountdown();},1200);
@@ -462,117 +338,126 @@ function doCountdown(){
 }
 function reA(el,v){el.style.animation="none";void el.offsetWidth;el.style.animation=v;}
 
-function updCam(){
-  const t=S.tpl,n=S.pics.length;
-  document.getElementById("shot-label").textContent="📸 ถ่ายรูปที่ "+Math.min(n+1,3)+" / 3";
-  // dots
-  const dr=document.getElementById("dot-row"); dr.innerHTML="";
+function updCam() {
+  const n = S.pics.length;
+  document.getElementById("shot-label").textContent = "📸 ถ่ายรูปที่ "+Math.min(n+1,3)+" / 3";
+  const dr = document.getElementById("dot-row"); dr.innerHTML = "";
   for(let i=0;i<3;i++){const d=document.createElement("div");d.className="dot "+(i<n?"done":i===n?"current":"pending");dr.appendChild(d);}
-  // thumbs
-  const tr=document.getElementById("thumb-row"); tr.innerHTML="";
-  S.pics.forEach((p,i)=>{
-    const d=document.createElement("div");d.className="thumb";d.style.border="2px solid "+t.fb;
-    d.innerHTML=`<img src="${p}">`;tr.appendChild(d);
-  });
+  const tr = document.getElementById("thumb-row"); tr.innerHTML = "";
+  S.pics.forEach((p,i)=>{const d=document.createElement("div");d.className="thumb";d.innerHTML=`<img src="${p}">`;tr.appendChild(d);});
   for(let i=n;i<3;i++){const d=document.createElement("div");d.className="thumb-empty";d.textContent=i+1;tr.appendChild(d);}
-  document.getElementById("shutter").style.display=n<3?"flex":"none";
+  document.getElementById("shutter").style.display = n<3 ? "flex" : "none";
 }
 
-/* ═══════════ REVIEW ═══════════ */
-function goReview(){
-  document.getElementById("rv-load").style.display="block";
-  document.getElementById("rv-result").style.display="none";
-  go("review"); setTimeout(compose,300);
+/* ═══════════ REVIEW & COMPOSITE ═══════════ */
+function goReview() {
+  document.getElementById("rv-load").style.display = "block";
+  document.getElementById("rv-result").style.display = "none";
+  go("review"); setTimeout(compose, 300);
 }
 
-async function compose(){
-  const t=S.tpl,cv=document.createElement("canvas");
-  cv.width=SW;cv.height=SH;const ctx=cv.getContext("2d");
-  const g=ctx.createLinearGradient(0,0,0,SH);
-  g.addColorStop(0,t.c[0]);g.addColorStop(.4,t.c[1]);g.addColorStop(1,t.c[2]);
-  ctx.fillStyle=g;ctx.fillRect(0,0,SW,SH);
-  // title
-  ctx.textAlign="center";ctx.fillStyle="#FFF";
-  ctx.font="bold 58px 'Georgia',serif";ctx.fillText("Aloha",SW/2,82);
-  ctx.font="bold 30px 'Sarabun',sans-serif";ctx.fillText("THANK YOU PARTY",SW/2,128);
-  // photos
-  for(let i=0;i<3;i++){
-    const p=PP[i];
-    ctx.strokeStyle=t.fb;ctx.lineWidth=4;
-    ctx.setLineDash(t.dash?[12,4]:[]);ctx.strokeRect(p.x-4,p.y-4,p.w+8,p.h+8);ctx.setLineDash([]);
-    const img=new Image();img.src=S.pics[i];
-    await new Promise(r=>{img.onload=r;img.onerror=r;});
-    ctx.drawImage(img,p.x,p.y,p.w,p.h);
+async function compose() {
+  const t = S.tpl;
+  const cv = document.createElement("canvas");
+  cv.width = FW; cv.height = FH;
+  const ctx = cv.getContext("2d");
+
+  // 1. Fill white background
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, FW, FH);
+
+  // 2. Draw photos into slots
+  for(let i=0; i<3; i++) {
+    const slot = t.slots[i];
+    if(!S.pics[i]) continue;
+
+    const img = new Image();
+    img.src = S.pics[i];
+    await new Promise(r => { img.onload=r; img.onerror=r; });
+
+    // Crop to fit slot aspect ratio
+    const sr = slot.w / slot.h;
+    const ir = img.width / img.height;
+    let sx=0, sy=0, sw=img.width, sh=img.height;
+    if(ir > sr) { sw = sh * sr; sx = (img.width - sw) / 2; }
+    else { sh = sw / sr; sy = (img.height - sh) / 2; }
+
+    ctx.drawImage(img, sx, sy, sw, sh, slot.x, slot.y, slot.w, slot.h);
   }
-  // bottom
-  ctx.fillStyle="#FFF";ctx.font="bold 28px 'Sarabun',sans-serif";
-  ctx.fillText("ขอขอบคุณสำหรับ",SW/2,1475);
-  ctx.fillText("ความทุ่มเทในไตรมาสที่ผ่านมา",SW/2,1515);
-  ctx.font="20px 'Sarabun',sans-serif";ctx.fillStyle="rgba(255,255,255,.7)";
-  ctx.fillText("3 April 2026 | WanDeeDee Cafe x Restaurant",SW/2,1565);
-  // dots
-  ctx.fillStyle="#FFF";
-  [[60,590],[540,590],[80,1010],[520,1010],[120,1610],[480,1610]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();});
 
-  S.comp=cv.toDataURL("image/png");
-  // show result
-  document.getElementById("rv-load").style.display="none";
-  const r=document.getElementById("rv-result");r.style.display="block";reA(r,"postcardFlip 1s ease-out");
-  const bx=document.getElementById("strip-box");bx.style.background=t.bgCSS;bx.innerHTML=`<img src="${S.comp}">`;
-  // auto upload to Drive
+  // 3. Draw frame overlay on top
+  if(t.imgObj) {
+    ctx.drawImage(t.imgObj, 0, 0, FW, FH);
+  } else {
+    // Fallback: try loading again
+    const frameImg = new Image();
+    frameImg.crossOrigin = "anonymous";
+    frameImg.src = t.src;
+    await new Promise(r => { frameImg.onload=r; frameImg.onerror=r; });
+    if(frameImg.complete && frameImg.naturalWidth > 0) {
+      ctx.drawImage(frameImg, 0, 0, FW, FH);
+    }
+  }
+
+  S.comp = cv.toDataURL("image/png");
+
+  // Show result
+  document.getElementById("rv-load").style.display = "none";
+  const r = document.getElementById("rv-result"); r.style.display = "block";
+  reA(r, "postcardFlip 1s ease-out");
+  document.getElementById("strip-box").innerHTML = `<img src="${S.comp}">`;
+
+  // Upload to Drive
   uploadToDrive();
 }
 
 /* ═══════════ GOOGLE DRIVE UPLOAD + QR ═══════════ */
-async function uploadToDrive(){
-  const area=document.getElementById("qr-status");
-  driveUrl=null;
+async function uploadToDrive() {
+  const area = document.getElementById("qr-status");
+  driveUrl = null;
 
-  // Show uploading state
-  area.innerHTML=`
+  area.innerHTML = `
     <div style="font-size:36px;margin-bottom:8px;animation:spin 1.2s linear infinite">⏳</div>
     <p style="color:rgba(255,255,255,.85);font-size:13px">กำลังอัปโหลดรูปไป Google Drive...</p>`;
 
-  try{
-    if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL.includes('ใส่_URL')){
+  try {
+    if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('ใส่_URL')) {
       throw new Error('ยังไม่ได้ตั้งค่า Apps Script URL');
     }
 
     console.log('Uploading to:', APPS_SCRIPT_URL);
-    const fileName='Aloha-Party-'+Date.now()+'.png';
-    
-    const resp=await fetch(APPS_SCRIPT_URL,{
+    const fileName = 'Aloha-Party-' + Date.now() + '.png';
+
+    const resp = await fetch(APPS_SCRIPT_URL, {
       method:'POST',
       headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({image:S.comp, fileName:fileName}),
       redirect:'follow'
     });
-    
-    console.log('Response status:', resp.status);
-    const text=await resp.text();
-    console.log('Response body:', text);
-    
-    let result;
-    try{ result=JSON.parse(text); }catch(pe){ throw new Error('ไม่สามารถอ่านผลลัพธ์ได้: '+text.substring(0,100)); }
 
-    if(result.success){
-      driveUrl=result.directUrl;
-      console.log('Upload success! Direct URL:', result.directUrl);
-      console.log('View URL:', result.viewUrl);
-      area.innerHTML=`
+    console.log('Response status:', resp.status);
+    const text = await resp.text();
+    console.log('Response body:', text);
+
+    let result;
+    try{ result = JSON.parse(text); } catch(pe){ throw new Error('ไม่สามารถอ่านผลลัพธ์ได้: '+text.substring(0,100)); }
+
+    if(result.success) {
+      driveUrl = result.directUrl;
+      area.innerHTML = `
         <div style="background:linear-gradient(135deg,#4CAF50,#2E7D32);color:#FFF;padding:8px 16px;border-radius:10px;font-size:14px;font-weight:700;margin-bottom:14px;display:inline-block">✅ อัปโหลดสำเร็จ!</div>
         <p style="color:rgba(255,255,255,.8);font-size:13px;margin-bottom:12px">📱 สแกน QR เพื่อเปิดรูปในมือถือ</p>
         <div class="qr-wrapper" id="qr-code"></div>
         <p style="color:rgba(255,255,255,.5);font-size:11px;margin-top:10px">กดค้างที่รูป → Save Image</p>
         <a href="${result.viewUrl}" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;padding:8px 20px;background:var(--gold);color:#5D4037;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none">🔗 เปิดใน Google Drive</a>`;
-      const qr=document.getElementById("qr-code");
+      const qr = document.getElementById("qr-code");
       if(qr) new QRCode(qr,{text:result.directUrl,width:160,height:160,colorDark:"#000",colorLight:"#fff",correctLevel:QRCode.CorrectLevel.M});
     } else {
-      throw new Error(result.error||'Upload failed - no success flag');
+      throw new Error(result.error || 'Upload failed');
     }
-  }catch(err){
-    console.error('Upload error:',err);
-    area.innerHTML=`
+  } catch(err) {
+    console.error('Upload error:', err);
+    area.innerHTML = `
       <div style="background:rgba(255,70,70,.2);border:1px solid rgba(255,100,100,.4);border-radius:12px;padding:14px;margin-bottom:14px">
         <p style="color:#FF8A80;font-size:13px;font-weight:700;margin-bottom:4px">⚠️ อัปโหลดไม่สำเร็จ</p>
         <p style="color:rgba(255,255,255,.6);font-size:11px;word-break:break-all">${err.message}</p>
@@ -583,21 +468,21 @@ async function uploadToDrive(){
   }
 }
 
-function openImageTab(){
-  if(!S.comp)return;
-  const w=window.open('');
-  if(w){
+function openImageTab() {
+  if(!S.comp) return;
+  const w = window.open('');
+  if(w) {
     w.document.write(`<html><head><title>Aloha Photo Strip</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${S.comp}" style="max-width:100%;max-height:100vh"></body></html>`);
   }
 }
 
-function dlStrip(){
-  if(!S.comp)return;
-  const a=document.createElement("a");a.href=S.comp;a.download="aloha-photobooth.png";a.click();
+function dlStrip() {
+  if(!S.comp) return;
+  const a = document.createElement("a"); a.href = S.comp; a.download = "aloha-photobooth.png"; a.click();
 }
 
-function resetAll(){
-  stopCam(); driveUrl=null; S={tpl:null,pics:[],stream:null,comp:null}; go("start");
+function resetAll() {
+  stopCam(); driveUrl = null; S = {tpl:null, pics:[], stream:null, comp:null}; go("start");
 }
 </script>
 </body>
