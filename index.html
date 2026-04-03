@@ -329,12 +329,12 @@
       <div style="margin-top:24px;display:flex;flex-direction:column;align-items:center">
         <button class="btn-gold" onclick="dlStrip()">💾 ดาวน์โหลด Photo Strip</button>
       </div>
-      <div class="glass-card" style="margin-top:20px">
-        <p style="color:rgba(255,255,255,.8);font-size:13px;margin-bottom:14px">สแกน QR Code เพื่อดาวน์โหลดรูป</p>
-        <div class="qr-wrapper" id="qr-code"></div>
-        <p style="color:rgba(255,255,255,.45);font-size:11px;margin-top:14px;word-break:break-all">
-          หรือเปิดลิงก์: <a href="https://drive.google.com/drive/folders/1fj4mcwhY9vQjASLgZzbEruam9xICPSxN?usp=sharing" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none">Google Drive ↗</a>
-        </p>
+      <!-- QR / Upload area -->
+      <div id="qr-area" class="glass-card" style="margin-top:20px">
+        <div id="qr-status" style="text-align:center">
+          <div style="font-size:36px;margin-bottom:8px;animation:spin 1.2s linear infinite">⏳</div>
+          <p style="color:rgba(255,255,255,.85);font-size:13px">กำลังอัปโหลดรูปไป Google Drive...</p>
+        </div>
       </div>
       <div style="text-align:center;margin-top:24px;padding-bottom:36px">
         <button class="btn-ghost" onclick="resetAll()">🔄 ถ่ายใหม่</button>
@@ -347,7 +347,11 @@
 /* ═══════════ CONSTANTS ═══════════ */
 const SW=600,SH=1800;
 const PP=[{x:40,y:180,w:520,h:390},{x:40,y:600,w:520,h:390},{x:40,y:1020,w:520,h:390}];
-const DURL="https://drive.google.com/drive/folders/1fj4mcwhY9vQjASLgZzbEruam9xICPSxN?usp=sharing";
+
+// ⚠️ วาง URL ของ Google Apps Script ที่ Deploy แล้วตรงนี้
+const APPS_SCRIPT_URL = 'ใส่_URL_ของ_APPS_SCRIPT_ที่นี่';
+
+let driveUrl = null; // เก็บลิงก์ไว้ใช้ซ้ำ
 
 const TPL=[
   {id:1,name:"Tropical Paradise",desc:"ดอกชบาและใบปาล์ม",accent:"#FF6B35",bg:"bg-tropical",fb:"#FFD700",
@@ -511,13 +515,71 @@ async function compose(){
   [[60,590],[540,590],[80,1010],[520,1010],[120,1610],[480,1610]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();});
 
   S.comp=cv.toDataURL("image/png");
-  // show
+  // show result
   document.getElementById("rv-load").style.display="none";
   const r=document.getElementById("rv-result");r.style.display="block";reA(r,"postcardFlip 1s ease-out");
   const bx=document.getElementById("strip-box");bx.style.background=t.bgCSS;bx.innerHTML=`<img src="${S.comp}">`;
-  // QR
-  const qr=document.getElementById("qr-code");qr.innerHTML="";
-  new QRCode(qr,{text:DURL,width:140,height:140,colorDark:"#000",colorLight:"#fff",correctLevel:QRCode.CorrectLevel.M});
+  // auto upload to Drive
+  uploadToDrive();
+}
+
+/* ═══════════ GOOGLE DRIVE UPLOAD + QR ═══════════ */
+async function uploadToDrive(){
+  const area=document.getElementById("qr-status");
+  driveUrl=null;
+
+  // Show uploading state
+  area.innerHTML=`
+    <div style="font-size:36px;margin-bottom:8px;animation:spin 1.2s linear infinite">⏳</div>
+    <p style="color:rgba(255,255,255,.85);font-size:13px">กำลังอัปโหลดรูปไป Google Drive...</p>`;
+
+  try{
+    if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL.includes('ใส่_URL')){
+      throw new Error('No Apps Script URL');
+    }
+
+    const fileName='Aloha-Party-'+Date.now()+'.png';
+    const resp=await fetch(APPS_SCRIPT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({image:S.comp, fileName:fileName})
+    });
+    const result=await resp.json();
+
+    if(result.success){
+      driveUrl=result.directUrl;
+      area.innerHTML=`
+        <div style="background:linear-gradient(135deg,#4CAF50,#2E7D32);color:#FFF;padding:8px 16px;border-radius:10px;font-size:14px;font-weight:700;margin-bottom:14px;display:inline-block">✅ อัปโหลดสำเร็จ!</div>
+        <p style="color:rgba(255,255,255,.8);font-size:13px;margin-bottom:12px">📱 สแกน QR เพื่อเปิดรูปในมือถือ</p>
+        <div class="qr-wrapper" id="qr-code"></div>
+        <p style="color:rgba(255,255,255,.5);font-size:11px;margin-top:10px">กดค้างที่รูป → Save Image</p>
+        <a href="${result.viewUrl}" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;padding:8px 20px;background:var(--gold);color:#5D4037;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none">🔗 เปิดใน Google Drive</a>`;
+      // Generate QR pointing to direct image URL
+      const qr=document.getElementById("qr-code");
+      if(qr) new QRCode(qr,{text:result.directUrl,width:160,height:160,colorDark:"#000",colorLight:"#fff",correctLevel:QRCode.CorrectLevel.M});
+    } else {
+      throw new Error(result.error||'Upload failed');
+    }
+  }catch(err){
+    console.error('Upload error:',err);
+    // Fallback: show page QR + open image option
+    area.innerHTML=`
+      <p style="color:rgba(255,255,255,.7);font-size:13px;margin-bottom:12px">📱 สแกน QR เพื่อเปิด Photobooth บนมือถือ</p>
+      <div class="qr-wrapper" id="qr-code"></div>
+      <p style="color:rgba(255,255,255,.5);font-size:11px;margin-top:10px">หรือกดปุ่มด้านล่างเพื่อเปิดรูปเต็มจอ (กดค้าง Save)</p>
+      <button onclick="openImageTab()" style="margin-top:10px;padding:8px 20px;background:var(--gold);color:#5D4037;border:none;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">🖼️ เปิดรูปเต็มจอ</button>`;
+    const pageUrl=window.location.href.split('#')[0];
+    const qr=document.getElementById("qr-code");
+    if(qr) new QRCode(qr,{text:pageUrl,width:160,height:160,colorDark:"#000",colorLight:"#fff",correctLevel:QRCode.CorrectLevel.M});
+  }
+}
+
+function openImageTab(){
+  if(!S.comp)return;
+  const w=window.open('');
+  if(w){
+    w.document.write(`<html><head><title>Aloha Photo Strip</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${S.comp}" style="max-width:100%;max-height:100vh"></body></html>`);
+  }
 }
 
 function dlStrip(){
@@ -526,7 +588,7 @@ function dlStrip(){
 }
 
 function resetAll(){
-  stopCam(); S={tpl:null,pics:[],stream:null,comp:null}; go("start");
+  stopCam(); driveUrl=null; S={tpl:null,pics:[],stream:null,comp:null}; go("start");
 }
 </script>
 </body>
