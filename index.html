@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-  :root { --gold:#FFD700; }
+  :root{--gold:#FFD700}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;overflow-x:hidden}
   body{font-family:'Sarabun','Georgia',serif;-webkit-font-smoothing:antialiased;background:#E85D26}
@@ -16,7 +16,6 @@
   .screen{display:none;width:100%;min-height:100vh;min-height:100dvh;flex-direction:column;align-items:center;position:relative;overflow:hidden}
   .screen.active{display:flex}
   .screen-inner{width:100%;max-width:460px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:2}
-
   .screen::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1}
 
   .bg-tropical{background:linear-gradient(160deg,#FFB347 0%,#FF6B35 35%,#E85D26 70%,#D44E1C 100%)}
@@ -47,11 +46,9 @@
 
   .btn-gold{width:100%;max-width:280px;padding:15px 24px;background:linear-gradient(135deg,#FFD700,#FFC107);color:#5D4037;border:none;border-radius:50px;font-size:16px;font-weight:700;font-family:'Sarabun',sans-serif;cursor:pointer;box-shadow:0 4px 20px rgba(255,193,7,.4);transition:transform .2s}
   .btn-gold:hover{transform:scale(1.03)}
-
   .btn-cancel{margin-top:16px;background:transparent;border:none;color:rgba(255,255,255,.55);font-size:13px;cursor:pointer;padding:8px 16px;font-family:'Sarabun',sans-serif;transition:color .2s}
   .btn-cancel:hover{color:rgba(255,255,255,.85)}
 
-  /* Template cards */
   .tpl-card{width:100%;border:2.5px solid rgba(255,255,255,.25);border-radius:18px;padding:0;cursor:pointer;overflow:hidden;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 24px rgba(0,0,0,.15);text-align:left;font-family:'Sarabun',sans-serif;position:relative}
   .tpl-card::after{content:'→';position:absolute;right:20px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.5);font-size:22px;transition:all .25s}
   .tpl-card:hover{transform:translateY(-2px) scale(1.015);border-color:rgba(255,255,255,.6);box-shadow:0 8px 32px rgba(0,0,0,.25)}
@@ -63,7 +60,6 @@
   .tpl-name{color:#FFF;font-size:17px;font-weight:700;margin-bottom:3px;text-shadow:1px 1px 3px rgba(0,0,0,.25)}
   .tpl-desc{color:rgba(255,255,255,.75);font-size:13px}
 
-  /* Camera */
   .cam-box{position:relative;width:100%;max-width:400px;aspect-ratio:4/3;border-radius:18px;overflow:hidden;box-shadow:0 8px 36px rgba(0,0,0,.3);background:#111;border:4px solid var(--gold)}
   .cam-box video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
   .cam-overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:10}
@@ -81,19 +77,15 @@
 
   .dot-row{display:flex;gap:8px;margin-bottom:18px}
   .dot{height:10px;border-radius:5px;transition:all .4s cubic-bezier(.4,0,.2,1)}
-  .dot.done{width:36px;background:var(--gold)}
-  .dot.current{width:14px;background:rgba(255,215,0,.5)}
-  .dot.pending{width:10px;background:rgba(255,255,255,.25)}
+  .dot.done{width:36px;background:var(--gold)}.dot.current{width:14px;background:rgba(255,215,0,.5)}.dot.pending{width:10px;background:rgba(255,255,255,.25)}
 
   .thumb-row{display:flex;gap:8px;margin-top:18px;min-height:58px}
   .thumb{width:74px;height:56px;border-radius:8px;overflow:hidden;animation:popIn .35s ease-out;border:2px solid var(--gold)}
   .thumb img{width:100%;height:100%;object-fit:cover}
   .thumb-empty{width:74px;height:56px;border-radius:8px;border:2px dashed rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.35);font-size:13px;font-weight:600}
 
-  /* Review */
   .strip-preview{width:100%;max-width:220px;margin:0 auto;aspect-ratio:600/1800;border-radius:14px;overflow:hidden;box-shadow:0 16px 56px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.1)}
   .strip-preview img{width:100%;height:100%;object-fit:cover}
-
   .glass-card{margin-top:24px;padding:22px 24px;background:rgba(255,255,255,.1);border-radius:18px;text-align:center;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);width:100%}
   .qr-wrapper{display:inline-block;background:#FFF;padding:14px;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.2)}
 
@@ -102,7 +94,7 @@
 </head>
 <body>
 
-<!-- ════════════════ START ════════════════ -->
+<!-- ════════ START ════════ -->
 <div id="screen-start" class="screen active bg-tropical">
   <div class="deco-layer" id="start-deco"></div>
   <div class="screen-inner" style="padding-top:0">
@@ -112,7 +104,7 @@
       <h2 class="title-sub" style="margin-top:6px">Thank You Party</h2>
       <div style="margin-top:28px">
         <p style="color:rgba(255,255,255,.9);font-size:16px;font-weight:600">Virtual Photobooth</p>
-        <p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:4px;letter-spacing:.5px">3 April 2026 • WanDeeDee Cafe x Restaurant</p>
+        <p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:4px">3 April 2026 • WanDeeDee Cafe x Restaurant</p>
       </div>
     </div>
     <div style="margin-top:clamp(32px,6vh,52px);animation:fadeSlideUp .9s ease-out .2s both">
@@ -124,7 +116,7 @@
   </div>
 </div>
 
-<!-- ════════════════ SELECT ════════════════ -->
+<!-- ════════ SELECT ════════ -->
 <div id="screen-select" class="screen bg-tropical">
   <div class="deco-layer"></div>
   <div class="screen-inner">
@@ -137,7 +129,7 @@
   </div>
 </div>
 
-<!-- ════════════════ CAMERA ════════════════ -->
+<!-- ════════ CAMERA ════════ -->
 <div id="screen-camera" class="screen bg-tropical">
   <div class="deco-layer"></div>
   <div class="screen-inner">
@@ -151,14 +143,12 @@
     </div>
     <canvas id="cap-canvas" style="display:none"></canvas>
     <div id="thumb-row" class="thumb-row"></div>
-    <button id="shutter" class="shutter-btn" onclick="doCountdown()">
-      <div class="shutter-btn-inner" id="shutter-inner"></div>
-    </button>
+    <button id="shutter" class="shutter-btn" onclick="doCountdown()"><div class="shutter-btn-inner"></div></button>
     <button class="btn-cancel" onclick="resetAll()">ยกเลิก</button>
   </div>
 </div>
 
-<!-- ════════════════ REVIEW ════════════════ -->
+<!-- ════════ REVIEW ════════ -->
 <div id="screen-review" class="screen bg-tropical">
   <div class="deco-layer"></div>
   <div class="screen-inner" style="max-width:400px">
@@ -173,14 +163,12 @@
         <p style="color:var(--gold);font-size:17px;font-weight:800;margin-bottom:6px">Aloha Thank You Party</p>
         <p style="color:rgba(255,255,255,.85);font-size:14px;line-height:1.7">ขอขอบคุณสำหรับความทุ่มเทในไตรมาสที่ผ่านมา</p>
       </div>
-      <div style="margin-top:24px;display:flex;flex-direction:column;align-items:center">
+      <div style="margin-top:24px;display:flex;flex-direction:column;gap:12px;align-items:center">
         <button class="btn-gold" onclick="dlStrip()">💾 ดาวน์โหลด Photo Strip</button>
+        <button class="btn-gold" style="background:linear-gradient(135deg,#4FC3F7,#039BE5);color:#FFF;box-shadow:0 4px 20px rgba(3,155,229,.4)" onclick="shareStrip()">📤 แชร์รูป</button>
       </div>
       <div id="qr-area" class="glass-card" style="margin-top:20px">
-        <div id="qr-status" style="text-align:center">
-          <div style="font-size:36px;margin-bottom:8px;animation:spin 1.2s linear infinite">⏳</div>
-          <p style="color:rgba(255,255,255,.85);font-size:13px">กำลังอัปโหลดรูปไป Google Drive...</p>
-        </div>
+        <div id="qr-status"></div>
       </div>
       <div style="text-align:center;margin-top:24px;padding-bottom:36px">
         <button class="btn-ghost" onclick="resetAll()">🔄 ถ่ายใหม่</button>
@@ -190,28 +178,26 @@
 </div>
 
 <script>
-/* ═══════════ CONSTANTS ═══════════ */
-const FW=600, FH=1800;
+/* ═══════════ CONFIG ═══════════ */
+const FW = 600, FH = 1800;
 
 // ⚠️ Google Apps Script URL
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNrTsHoPahfhPBn2uIDDhCjtv1PNUSHFbU9RAWXChTCB4b5lhLYOlNsYGY10iuWxI/exec';
 
 let driveUrl = null;
 
-/* ═══════════ FRAME TEMPLATES ═══════════ */
+/* ═══════════ TEMPLATES ═══════════ */
 const TEMPLATES = [
   {
     id: 1,
     name: "Aloha Beach",
     desc: "ชายหาดและสัตว์ทะเล",
     src: "frame_aloha.png",
-    accent: "#FF6B35",
-    bgClass: "bg-tropical",
-    bgCSS: "linear-gradient(160deg,#FFB347 0%,#FF6B35 35%,#E85D26 70%,#D44E1C 100%)",
+    bgCSS: "linear-gradient(160deg,#5BA3D9 0%,#F2C078 50%,#D4A05A 100%)",
     slots: [
-      { x:137, y:216, w:333, h:323 },
-      { x:100, y:591, w:389, h:388 },
-      { x:167, y:1092, w:281, h:365 },
+      { x:139, y:218, w:329, h:380 },
+      { x:123, y:674, w:350, h:357 },
+      { x:176, y:1096, w:258, h:353 },
     ],
     imgObj: null,
   },
@@ -220,13 +206,11 @@ const TEMPLATES = [
     name: "Summer Holiday",
     desc: "กระดาษฉีกสไตล์ซัมเมอร์",
     src: "frame_summer.png",
-    accent: "#E8A0BF",
-    bgClass: "bg-tropical",
-    bgCSS: "linear-gradient(160deg,#FCEABB 0%,#F8B500 35%,#F09819 70%,#E85D26 100%)",
+    bgCSS: "linear-gradient(160deg,#FCEABB 0%,#F8B500 50%,#F09819 100%)",
     slots: [
-      { x:51, y:266, w:497, h:382 },
-      { x:51, y:691, w:497, h:372 },
-      { x:51, y:1101, w:497, h:367 },
+      { x:64, y:295, w:471, h:337 },
+      { x:64, y:714, w:471, h:336 },
+      { x:65, y:1113, w:470, h:337 },
     ],
     imgObj: null,
   },
@@ -245,16 +229,16 @@ document.addEventListener("DOMContentLoaded", () => {
     layer.appendChild(d);
   });
 
-  // Preload frame images
+  // Preload frames
   TEMPLATES.forEach(t => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = t.src;
-    img.onload = () => { t.imgObj = img; console.log("Loaded frame:", t.src); };
-    img.onerror = () => console.error("Failed to load frame:", t.src);
+    img.onload = () => { t.imgObj = img; console.log("Frame loaded:", t.src); };
+    img.onerror = () => console.error("Frame failed:", t.src);
   });
 
-  // Build template cards
+  // Template cards
   const list = document.getElementById("tpl-list");
   TEMPLATES.forEach((t, i) => {
     const card = document.createElement("button");
@@ -262,14 +246,10 @@ document.addEventListener("DOMContentLoaded", () => {
     card.style.background = t.bgCSS;
     card.style.animation = `fadeSlideUp .5s ease-out ${.1+i*.12}s both`;
     card.onclick = () => pickTpl(t);
-    card.innerHTML = `
-      <div class="tpl-inner">
-        <div class="tpl-preview"><img src="${t.src}" alt="${t.name}"></div>
-        <div>
-          <div class="tpl-name">${t.name}</div>
-          <div class="tpl-desc">${t.desc}</div>
-        </div>
-      </div>`;
+    card.innerHTML = `<div class="tpl-inner">
+      <div class="tpl-preview"><img src="${t.src}" alt="${t.name}"></div>
+      <div><div class="tpl-name">${t.name}</div><div class="tpl-desc">${t.desc}</div></div>
+    </div>`;
     list.appendChild(card);
   });
 });
@@ -277,8 +257,8 @@ document.addEventListener("DOMContentLoaded", () => {
 /* ═══════════ NAV ═══════════ */
 function go(n) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById("screen-"+n).classList.add("active");
-  window.scrollTo(0,0);
+  document.getElementById("screen-" + n).classList.add("active");
+  window.scrollTo(0, 0);
 }
 
 function pickTpl(t) {
@@ -292,7 +272,7 @@ async function startCam() {
   const er = document.getElementById("err-layer"); er.classList.remove("on");
   try {
     const s = await navigator.mediaDevices.getUserMedia({
-      video:{ facingMode:"user", width:{ideal:1280}, height:{ideal:960} }, audio:false
+      video: { facingMode:"user", width:{ideal:1280}, height:{ideal:960} }, audio: false
     });
     S.stream = s;
     const v = document.getElementById("video"); v.srcObject = s; await v.play();
@@ -301,19 +281,19 @@ async function startCam() {
     er.classList.add("on");
   }
 }
-function stopCam() { if(S.stream){S.stream.getTracks().forEach(t=>t.stop());S.stream=null;} }
+function stopCam() { if (S.stream) { S.stream.getTracks().forEach(t => t.stop()); S.stream = null; } }
 
 function snap() {
   const v = document.getElementById("video"), c = document.getElementById("cap-canvas");
-  // Capture at slot aspect ratio of current template's first slot (roughly 4:3)
   c.width = 520; c.height = 390;
-  const ctx = c.getContext("2d"), vw = v.videoWidth, vh = v.videoHeight;
-  const r = 520/390, vr = vw/vh;
+  const ctx = c.getContext("2d");
+  const vw = v.videoWidth, vh = v.videoHeight, r = 520/390, vr = vw/vh;
   let sx=0,sy=0,sw=vw,sh=vh;
-  if(vr>r){sw=vh*r;sx=(vw-sw)/2}else{sh=vw/r;sy=(vh-sh)/2}
-  ctx.save();ctx.translate(520,0);ctx.scale(-1,1);
-  ctx.drawImage(v,sx,sy,sw,sh,0,0,520,390);ctx.restore();
-  return c.toDataURL("image/jpeg",.92);
+  if (vr > r) { sw = vh*r; sx = (vw-sw)/2; } else { sh = vw/r; sy = (vh-sh)/2; }
+  ctx.save(); ctx.translate(520,0); ctx.scale(-1,1);
+  ctx.drawImage(v, sx,sy,sw,sh, 0,0,520,390);
+  ctx.restore();
+  return c.toDataURL("image/jpeg", .92);
 }
 
 /* ═══════════ COUNTDOWN ═══════════ */
@@ -321,35 +301,35 @@ function doCountdown() {
   const btn = document.getElementById("shutter"); btn.style.display = "none";
   const ol = document.getElementById("cd-layer"), nm = document.getElementById("cd-num");
   ol.classList.add("on");
-  let ct = 3; nm.textContent = ct; reA(nm,"countPulse .9s ease-out");
+  let ct = 3; nm.textContent = ct; reA(nm, "countPulse .9s ease-out");
   const ti = setInterval(() => {
     ct--;
-    if(ct>0){ nm.textContent=ct; reA(nm,"countPulse .9s ease-out"); }
+    if (ct > 0) { nm.textContent = ct; reA(nm, "countPulse .9s ease-out"); }
     else {
       clearInterval(ti); ol.classList.remove("on");
       const fl = document.getElementById("fl-layer");
-      fl.classList.add("on"); reA(fl,"flashBang .35s ease-out forwards");
-      setTimeout(()=>fl.classList.remove("on"),350);
+      fl.classList.add("on"); reA(fl, "flashBang .35s ease-out forwards");
+      setTimeout(() => fl.classList.remove("on"), 350);
       S.pics.push(snap()); updCam();
-      if(S.pics.length>=3) setTimeout(()=>{stopCam();goReview();},700);
-      else setTimeout(()=>{btn.style.display="flex";doCountdown();},1200);
+      if (S.pics.length >= 3) setTimeout(() => { stopCam(); goReview(); }, 700);
+      else setTimeout(() => { btn.style.display = "flex"; doCountdown(); }, 1200);
     }
-  },1000);
+  }, 1000);
 }
-function reA(el,v){el.style.animation="none";void el.offsetWidth;el.style.animation=v;}
+function reA(el, v) { el.style.animation = "none"; void el.offsetWidth; el.style.animation = v; }
 
 function updCam() {
   const n = S.pics.length;
-  document.getElementById("shot-label").textContent = "📸 ถ่ายรูปที่ "+Math.min(n+1,3)+" / 3";
+  document.getElementById("shot-label").textContent = "📸 ถ่ายรูปที่ " + Math.min(n+1,3) + " / 3";
   const dr = document.getElementById("dot-row"); dr.innerHTML = "";
-  for(let i=0;i<3;i++){const d=document.createElement("div");d.className="dot "+(i<n?"done":i===n?"current":"pending");dr.appendChild(d);}
+  for (let i=0;i<3;i++) { const d = document.createElement("div"); d.className = "dot " + (i<n?"done":i===n?"current":"pending"); dr.appendChild(d); }
   const tr = document.getElementById("thumb-row"); tr.innerHTML = "";
-  S.pics.forEach((p,i)=>{const d=document.createElement("div");d.className="thumb";d.innerHTML=`<img src="${p}">`;tr.appendChild(d);});
-  for(let i=n;i<3;i++){const d=document.createElement("div");d.className="thumb-empty";d.textContent=i+1;tr.appendChild(d);}
+  S.pics.forEach((p,i) => { const d = document.createElement("div"); d.className = "thumb"; d.innerHTML = `<img src="${p}">`; tr.appendChild(d); });
+  for (let i=n;i<3;i++) { const d = document.createElement("div"); d.className = "thumb-empty"; d.textContent = i+1; tr.appendChild(d); }
   document.getElementById("shutter").style.display = n<3 ? "flex" : "none";
 }
 
-/* ═══════════ REVIEW & COMPOSITE ═══════════ */
+/* ═══════════ COMPOSE STRIP ═══════════ */
 function goReview() {
   document.getElementById("rv-load").style.display = "block";
   document.getElementById("rv-result").style.display = "none";
@@ -362,41 +342,32 @@ async function compose() {
   cv.width = FW; cv.height = FH;
   const ctx = cv.getContext("2d");
 
-  // 1. Fill white background
+  // 1. White background
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, FW, FH);
 
   // 2. Draw photos into slots
-  for(let i=0; i<3; i++) {
+  for (let i = 0; i < 3; i++) {
     const slot = t.slots[i];
-    if(!S.pics[i]) continue;
-
+    if (!S.pics[i]) continue;
     const img = new Image();
     img.src = S.pics[i];
-    await new Promise(r => { img.onload=r; img.onerror=r; });
-
-    // Crop to fit slot aspect ratio
-    const sr = slot.w / slot.h;
-    const ir = img.width / img.height;
-    let sx=0, sy=0, sw=img.width, sh=img.height;
-    if(ir > sr) { sw = sh * sr; sx = (img.width - sw) / 2; }
-    else { sh = sw / sr; sy = (img.height - sh) / 2; }
-
-    ctx.drawImage(img, sx, sy, sw, sh, slot.x, slot.y, slot.w, slot.h);
+    await new Promise(r => { img.onload = r; img.onerror = r; });
+    // Crop-to-fit
+    const sr = slot.w / slot.h, ir = img.width / img.height;
+    let sx=0,sy=0,sw=img.width,sh=img.height;
+    if (ir > sr) { sw = sh*sr; sx = (img.width-sw)/2; }
+    else { sh = sw/sr; sy = (img.height-sh)/2; }
+    ctx.drawImage(img, sx,sy,sw,sh, slot.x,slot.y,slot.w,slot.h);
   }
 
-  // 3. Draw frame overlay on top
-  if(t.imgObj) {
+  // 3. Frame overlay on top
+  if (t.imgObj) {
     ctx.drawImage(t.imgObj, 0, 0, FW, FH);
   } else {
-    // Fallback: try loading again
-    const frameImg = new Image();
-    frameImg.crossOrigin = "anonymous";
-    frameImg.src = t.src;
-    await new Promise(r => { frameImg.onload=r; frameImg.onerror=r; });
-    if(frameImg.complete && frameImg.naturalWidth > 0) {
-      ctx.drawImage(frameImg, 0, 0, FW, FH);
-    }
+    const fi = new Image(); fi.crossOrigin = "anonymous"; fi.src = t.src;
+    await new Promise(r => { fi.onload = r; fi.onerror = r; });
+    if (fi.complete && fi.naturalWidth > 0) ctx.drawImage(fi, 0, 0, FW, FH);
   }
 
   S.comp = cv.toDataURL("image/png");
@@ -407,11 +378,11 @@ async function compose() {
   reA(r, "postcardFlip 1s ease-out");
   document.getElementById("strip-box").innerHTML = `<img src="${S.comp}">`;
 
-  // Upload to Drive
+  // Upload
   uploadToDrive();
 }
 
-/* ═══════════ GOOGLE DRIVE UPLOAD + QR ═══════════ */
+/* ═══════════ UPLOAD TO GOOGLE DRIVE ═══════════ */
 async function uploadToDrive() {
   const area = document.getElementById("qr-status");
   driveUrl = null;
@@ -421,28 +392,16 @@ async function uploadToDrive() {
     <p style="color:rgba(255,255,255,.85);font-size:13px">กำลังอัปโหลดรูปไป Google Drive...</p>`;
 
   try {
-    if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('ใส่_URL')) {
-      throw new Error('ยังไม่ได้ตั้งค่า Apps Script URL');
-    }
-
-    console.log('Uploading to:', APPS_SCRIPT_URL);
     const fileName = 'Aloha-Party-' + Date.now() + '.png';
-
     const resp = await fetch(APPS_SCRIPT_URL, {
-      method:'POST',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({image:S.comp, fileName:fileName}),
-      redirect:'follow'
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ image: S.comp, fileName: fileName })
     });
 
-    console.log('Response status:', resp.status);
-    const text = await resp.text();
-    console.log('Response body:', text);
+    const result = await resp.json();
 
-    let result;
-    try{ result = JSON.parse(text); } catch(pe){ throw new Error('ไม่สามารถอ่านผลลัพธ์ได้: '+text.substring(0,100)); }
-
-    if(result.success) {
+    if (result.success) {
       driveUrl = result.directUrl;
       area.innerHTML = `
         <div style="background:linear-gradient(135deg,#4CAF50,#2E7D32);color:#FFF;padding:8px 16px;border-radius:10px;font-size:14px;font-weight:700;margin-bottom:14px;display:inline-block">✅ อัปโหลดสำเร็จ!</div>
@@ -451,7 +410,7 @@ async function uploadToDrive() {
         <p style="color:rgba(255,255,255,.5);font-size:11px;margin-top:10px">กดค้างที่รูป → Save Image</p>
         <a href="${result.viewUrl}" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;padding:8px 20px;background:var(--gold);color:#5D4037;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none">🔗 เปิดใน Google Drive</a>`;
       const qr = document.getElementById("qr-code");
-      if(qr) new QRCode(qr,{text:result.directUrl,width:160,height:160,colorDark:"#000",colorLight:"#fff",correctLevel:QRCode.CorrectLevel.M});
+      if (qr) new QRCode(qr, { text:result.directUrl, width:160, height:160, colorDark:"#000", colorLight:"#fff", correctLevel:QRCode.CorrectLevel.M });
     } else {
       throw new Error(result.error || 'Upload failed');
     }
@@ -460,7 +419,7 @@ async function uploadToDrive() {
     area.innerHTML = `
       <div style="background:rgba(255,70,70,.2);border:1px solid rgba(255,100,100,.4);border-radius:12px;padding:14px;margin-bottom:14px">
         <p style="color:#FF8A80;font-size:13px;font-weight:700;margin-bottom:4px">⚠️ อัปโหลดไม่สำเร็จ</p>
-        <p style="color:rgba(255,255,255,.6);font-size:11px;word-break:break-all">${err.message}</p>
+        <p style="color:rgba(255,255,255,.6);font-size:11px">${err.message}</p>
       </div>
       <p style="color:rgba(255,255,255,.7);font-size:13px;margin-bottom:12px">กดปุ่มด้านล่างเพื่อเปิดรูปเต็มจอ แล้วกดค้าง Save</p>
       <button onclick="openImageTab()" style="padding:10px 24px;background:var(--gold);color:#5D4037;border:none;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">🖼️ เปิดรูปเต็มจอ</button>
@@ -468,21 +427,35 @@ async function uploadToDrive() {
   }
 }
 
+/* ═══════════ SHARE / DOWNLOAD / HELPERS ═══════════ */
 function openImageTab() {
-  if(!S.comp) return;
+  if (!S.comp) return;
   const w = window.open('');
-  if(w) {
-    w.document.write(`<html><head><title>Aloha Photo Strip</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${S.comp}" style="max-width:100%;max-height:100vh"></body></html>`);
-  }
+  if (w) w.document.write(`<html><head><title>Aloha Photo Strip</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${S.comp}" style="max-width:100%;max-height:100vh"></body></html>`);
 }
 
 function dlStrip() {
-  if(!S.comp) return;
+  if (!S.comp) return;
   const a = document.createElement("a"); a.href = S.comp; a.download = "aloha-photobooth.png"; a.click();
 }
 
+async function shareStrip() {
+  if (!S.comp) return;
+  try {
+    const blob = await (await fetch(S.comp)).blob();
+    const file = new File([blob], 'aloha-photobooth.png', { type:'image/png' });
+    if (navigator.canShare && navigator.canShare({ files:[file] })) {
+      await navigator.share({ title:'Aloha Thank You Party 🌺', text:'Photo Strip จากงาน Aloha Thank You Party!', files:[file] });
+    } else {
+      openImageTab();
+    }
+  } catch(e) {
+    if (e.name !== 'AbortError') openImageTab();
+  }
+}
+
 function resetAll() {
-  stopCam(); driveUrl = null; S = {tpl:null, pics:[], stream:null, comp:null}; go("start");
+  stopCam(); driveUrl = null; S = { tpl:null, pics:[], stream:null, comp:null }; go("start");
 }
 </script>
 </body>
