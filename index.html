@@ -535,42 +535,51 @@ async function uploadToDrive(){
 
   try{
     if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL.includes('ใส่_URL')){
-      throw new Error('No Apps Script URL');
+      throw new Error('ยังไม่ได้ตั้งค่า Apps Script URL');
     }
 
+    console.log('Uploading to:', APPS_SCRIPT_URL);
     const fileName='Aloha-Party-'+Date.now()+'.png';
+    
     const resp=await fetch(APPS_SCRIPT_URL,{
       method:'POST',
       headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({image:S.comp, fileName:fileName})
+      body:JSON.stringify({image:S.comp, fileName:fileName}),
+      redirect:'follow'
     });
-    const result=await resp.json();
+    
+    console.log('Response status:', resp.status);
+    const text=await resp.text();
+    console.log('Response body:', text);
+    
+    let result;
+    try{ result=JSON.parse(text); }catch(pe){ throw new Error('ไม่สามารถอ่านผลลัพธ์ได้: '+text.substring(0,100)); }
 
     if(result.success){
       driveUrl=result.directUrl;
+      console.log('Upload success! Direct URL:', result.directUrl);
+      console.log('View URL:', result.viewUrl);
       area.innerHTML=`
         <div style="background:linear-gradient(135deg,#4CAF50,#2E7D32);color:#FFF;padding:8px 16px;border-radius:10px;font-size:14px;font-weight:700;margin-bottom:14px;display:inline-block">✅ อัปโหลดสำเร็จ!</div>
         <p style="color:rgba(255,255,255,.8);font-size:13px;margin-bottom:12px">📱 สแกน QR เพื่อเปิดรูปในมือถือ</p>
         <div class="qr-wrapper" id="qr-code"></div>
         <p style="color:rgba(255,255,255,.5);font-size:11px;margin-top:10px">กดค้างที่รูป → Save Image</p>
         <a href="${result.viewUrl}" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;padding:8px 20px;background:var(--gold);color:#5D4037;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none">🔗 เปิดใน Google Drive</a>`;
-      // Generate QR pointing to direct image URL
       const qr=document.getElementById("qr-code");
       if(qr) new QRCode(qr,{text:result.directUrl,width:160,height:160,colorDark:"#000",colorLight:"#fff",correctLevel:QRCode.CorrectLevel.M});
     } else {
-      throw new Error(result.error||'Upload failed');
+      throw new Error(result.error||'Upload failed - no success flag');
     }
   }catch(err){
     console.error('Upload error:',err);
-    // Fallback: show page QR + open image option
     area.innerHTML=`
-      <p style="color:rgba(255,255,255,.7);font-size:13px;margin-bottom:12px">📱 สแกน QR เพื่อเปิด Photobooth บนมือถือ</p>
-      <div class="qr-wrapper" id="qr-code"></div>
-      <p style="color:rgba(255,255,255,.5);font-size:11px;margin-top:10px">หรือกดปุ่มด้านล่างเพื่อเปิดรูปเต็มจอ (กดค้าง Save)</p>
-      <button onclick="openImageTab()" style="margin-top:10px;padding:8px 20px;background:var(--gold);color:#5D4037;border:none;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">🖼️ เปิดรูปเต็มจอ</button>`;
-    const pageUrl=window.location.href.split('#')[0];
-    const qr=document.getElementById("qr-code");
-    if(qr) new QRCode(qr,{text:pageUrl,width:160,height:160,colorDark:"#000",colorLight:"#fff",correctLevel:QRCode.CorrectLevel.M});
+      <div style="background:rgba(255,70,70,.2);border:1px solid rgba(255,100,100,.4);border-radius:12px;padding:14px;margin-bottom:14px">
+        <p style="color:#FF8A80;font-size:13px;font-weight:700;margin-bottom:4px">⚠️ อัปโหลดไม่สำเร็จ</p>
+        <p style="color:rgba(255,255,255,.6);font-size:11px;word-break:break-all">${err.message}</p>
+      </div>
+      <p style="color:rgba(255,255,255,.7);font-size:13px;margin-bottom:12px">กดปุ่มด้านล่างเพื่อเปิดรูปเต็มจอ แล้วกดค้าง Save</p>
+      <button onclick="openImageTab()" style="padding:10px 24px;background:var(--gold);color:#5D4037;border:none;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">🖼️ เปิดรูปเต็มจอ</button>
+      <br><button onclick="uploadToDrive()" style="margin-top:10px;padding:8px 20px;background:transparent;border:1px solid rgba(255,255,255,.3);color:#FFF;border-radius:20px;font-size:12px;cursor:pointer;font-family:'Sarabun',sans-serif">🔄 ลองอัปโหลดอีกครั้ง</button>`;
   }
 }
 
